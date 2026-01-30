@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
+import { AuthProvider } from "@/lib/auth-context"
+import { AuthLayoutWrapper } from "@/components/auth-layout-wrapper"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -10,7 +10,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "Workflows | Aerchain",
+  title: "Platform",
   description: "Configure workflows for your applications",
   icons: {
     icon: "/favicon.svg",
@@ -25,12 +25,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} font-sans antialiased text-sm`}>
-        <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset>
-            {children}
-          </SidebarInset>
-        </SidebarProvider>
+        <AuthProvider>
+          <AuthLayoutWrapper>{children}</AuthLayoutWrapper>
+        </AuthProvider>
       </body>
     </html>
   )

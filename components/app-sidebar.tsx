@@ -15,13 +15,16 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { Button } from "@/components/ui/button"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
   DashboardSquare01Icon,
   LayersLogoIcon,
   Settings02Icon,
   HelpCircleIcon,
+  ArrowRight01Icon,
 } from "@hugeicons/core-free-icons"
+import { useAuth } from "@/lib/auth-context"
 
 const navigation = [
   {
@@ -58,6 +61,7 @@ const navigation = [
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const { logout } = useAuth()
 
   return (
     <Sidebar>
@@ -99,7 +103,16 @@ export function AppSidebar() {
           </SidebarGroup>
         ))}
       </SidebarContent>
-      <SidebarFooter className="border-t border-sidebar-border p-3">
+      <SidebarFooter className="border-t border-sidebar-border p-3 flex flex-col gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={logout}
+          className="w-full justify-start h-6"
+        >
+          <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
+          <span>Logout</span>
+        </Button>
         <span className="text-[10px] text-muted-foreground">v1.0.0</span>
       </SidebarFooter>
     </Sidebar>
