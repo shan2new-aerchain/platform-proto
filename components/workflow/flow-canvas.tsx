@@ -77,7 +77,7 @@ export function FlowCanvas({
         source: "start",
         target: "add-start",
         type: "straight",
-        style: { stroke: "#d1d5db", strokeWidth: 1, strokeDasharray: "4 4" },
+        style: { stroke: "var(--color-border)", strokeWidth: 1, strokeDasharray: "4 4" },
       })
 
       edges.push({
@@ -85,7 +85,7 @@ export function FlowCanvas({
         source: "add-start",
         target: "end",
         type: "straight",
-        style: { stroke: "#d1d5db", strokeWidth: 1, strokeDasharray: "4 4" },
+        style: { stroke: "var(--color-border)", strokeWidth: 1, strokeDasharray: "4 4" },
       })
 
       currentY += addButtonSpacing
@@ -104,7 +104,7 @@ export function FlowCanvas({
         source: "start",
         target: "add-0",
         type: "straight",
-        style: { stroke: "#d1d5db", strokeWidth: 1, strokeDasharray: "4 4" },
+        style: { stroke: "var(--color-border)", strokeWidth: 1, strokeDasharray: "4 4" },
       })
 
       currentY += addButtonSpacing
@@ -119,7 +119,7 @@ export function FlowCanvas({
           source: `add-${index}`,
           target: stepId,
           type: "straight",
-          style: { stroke: "#d1d5db", strokeWidth: 1, strokeDasharray: "4 4" },
+          style: { stroke: "var(--color-border)", strokeWidth: 1, strokeDasharray: "4 4" },
         })
 
         // Step node
@@ -149,7 +149,7 @@ export function FlowCanvas({
           source: stepId,
           target: `add-${index + 1}`,
           type: "straight",
-          style: { stroke: "#d1d5db", strokeWidth: 1, strokeDasharray: "4 4" },
+          style: { stroke: "var(--color-border)", strokeWidth: 1, strokeDasharray: "4 4" },
         })
 
         currentY += addButtonSpacing
@@ -161,7 +161,7 @@ export function FlowCanvas({
         source: `add-${workflow.steps.length}`,
         target: "end",
         type: "straight",
-        style: { stroke: "#d1d5db", strokeWidth: 1, strokeDasharray: "4 4" },
+        style: { stroke: "var(--color-border)", strokeWidth: 1, strokeDasharray: "4 4" },
       })
     }
 

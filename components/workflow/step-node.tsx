@@ -25,10 +25,10 @@ const stepIconMap: Record<StepType, typeof Tick02Icon> = {
 }
 
 const stepColorMap: Record<StepType, { bg: string; icon: string }> = {
-  approval: { bg: "bg-emerald-500/10", icon: "text-emerald-600 dark:text-emerald-500" },
-  acknowledgement: { bg: "bg-blue-500/10", icon: "text-blue-600 dark:text-blue-500" },
-  review: { bg: "bg-amber-500/10", icon: "text-amber-600 dark:text-amber-500" },
-  assignment: { bg: "bg-purple-500/10", icon: "text-purple-600 dark:text-purple-500" },
+  approval: { bg: "bg-chart-1/10", icon: "text-chart-1" },
+  acknowledgement: { bg: "bg-chart-2/10", icon: "text-chart-2" },
+  review: { bg: "bg-chart-3/10", icon: "text-chart-3" },
+  assignment: { bg: "bg-chart-4/10", icon: "text-chart-4" },
 }
 
 interface StepNodeProps {
@@ -60,10 +60,10 @@ export const StepNode = memo(function StepNode({ data }: StepNodeProps) {
       <Handle type="target" position={Position.Top} className="bg-transparent! border-0! w-0! h-0!" />
       <div
         className={cn(
-          "w-[200px] cursor-pointer rounded-lg border bg-white shadow-sm transition-all overflow-hidden",
+          "w-[200px] cursor-pointer rounded-lg border bg-card text-card-foreground shadow-sm transition-all overflow-hidden",
           isSelected
             ? "border-primary ring-2 ring-primary/20 shadow-md"
-            : "border-stone-200 hover:border-stone-300 hover:shadow-md"
+            : "border-border hover:border-muted-foreground/30 hover:shadow-md"
         )}
       >
         {/* Header */}
@@ -81,7 +81,7 @@ export const StepNode = memo(function StepNode({ data }: StepNodeProps) {
         </div>
 
         {/* Action Bar - Compact */}
-        <div className="flex items-center justify-around border-t border-stone-100 bg-stone-50/50 px-1 py-1">
+        <div className="flex items-center justify-around border-t border-border bg-muted/50 px-1 py-1">
           <div 
             className={cn(
               "flex flex-col items-center gap-0.5 px-1.5 py-0.5 rounded",

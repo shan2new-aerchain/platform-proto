@@ -23,8 +23,8 @@ export const StartEndNode = memo(function StartEndNode({ data }: StartEndNodePro
           className={cn(
             "flex items-center justify-center rounded-lg px-6 py-2 text-xs font-medium shadow-sm border",
             type === "start"
-              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border-emerald-200 dark:border-emerald-500/20"
-              : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700"
+              ? "bg-primary/10 text-primary border-border"
+              : "bg-muted text-muted-foreground border-border"
           )}
         >
           {type === "start" ? "Start" : "End"}

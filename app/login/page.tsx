@@ -53,7 +53,6 @@ export default function LoginPage() {
                 alt="Platform Logo"
                 width={32}
                 height={32}
-                className="dark:invert"
               />
               <CardTitle className="text-2xl font-semibold tracking-tight">
                 Platform
