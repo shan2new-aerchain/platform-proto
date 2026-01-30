@@ -2,10 +2,9 @@
 
 import Link from "next/link"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { Notification02Icon, Settings02Icon, UserIcon, ArrowRight01Icon } from "@hugeicons/core-free-icons"
+import { Notification02Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons"
 import { Fragment } from "react"
 
 interface SiteHeaderProps {
@@ -41,16 +40,9 @@ export function SiteHeader({ title, breadcrumbs = [], actions }: SiteHeaderProps
 
       <div className="flex items-center gap-1 shrink-0">
         {actions}
-        <Separator orientation="vertical" className="mx-2 h-4" />
         <Button variant="ghost" size="icon-sm" className="h-8 w-8">
           <HugeiconsIcon icon={Notification02Icon} size={18} />
         </Button>
-        <Button variant="ghost" size="icon-sm" className="h-8 w-8">
-          <HugeiconsIcon icon={Settings02Icon} size={18} />
-        </Button>
-        <div className="ml-1 flex size-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-medium">
-          A
-        </div>
       </div>
     </header>
   )

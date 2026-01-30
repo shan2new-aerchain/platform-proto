@@ -110,8 +110,8 @@ export default function WorkflowBuilderPage({
               variant="secondary"
               className={
                 workflow.status === 'published'
-                  ? 'bg-green-100 text-green-700 capitalize'
-                  : 'bg-amber-100 text-amber-700 capitalize'
+                  ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 capitalize'
+                  : 'bg-amber-500/10 text-amber-700 dark:text-amber-400 capitalize'
               }
             >
               {workflow.status}

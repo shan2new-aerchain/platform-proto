@@ -26,39 +26,39 @@ export default function AppsPage() {
       
       <div className="p-4">
         {/* Stats Overview - Compact */}
-        <div className="mb-4 flex flex-wrap gap-3">
-          <div className="flex items-center gap-2 rounded-md border bg-card px-3 py-2">
-            <div className="flex size-6 items-center justify-center rounded bg-primary/10">
-              <HugeiconsIcon icon={WorkflowSquare10Icon} size={12} className="text-primary" />
+        <div className="mb-4 flex flex-wrap gap-2">
+          <div className="flex items-center gap-1.5 rounded-md border bg-card px-2 py-1.5">
+            <div className="flex size-5 items-center justify-center rounded bg-primary/10">
+              <HugeiconsIcon icon={WorkflowSquare10Icon} size={10} className="text-primary" />
             </div>
-            <div className="flex items-baseline gap-1.5">
+            <div className="flex items-baseline gap-1">
               <span className="text-sm font-semibold">{apps.length}</span>
               <span className="text-[10px] text-muted-foreground">Apps</span>
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-md border bg-card px-3 py-2">
-            <div className="flex size-6 items-center justify-center rounded bg-green-500/10">
-              <HugeiconsIcon icon={WorkflowSquare10Icon} size={12} className="text-green-600" />
+          <div className="flex items-center gap-1.5 rounded-md border bg-card px-2 py-1.5">
+            <div className="flex size-5 items-center justify-center rounded bg-primary/10">
+              <HugeiconsIcon icon={WorkflowSquare10Icon} size={10} className="text-primary" />
             </div>
-            <div className="flex items-baseline gap-1.5">
+            <div className="flex items-baseline gap-1">
               <span className="text-sm font-semibold">{apps.reduce((sum, app) => sum + app.workflowCount, 0)}</span>
               <span className="text-[10px] text-muted-foreground">Workflows</span>
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-md border bg-card px-3 py-2">
-            <div className="flex size-6 items-center justify-center rounded bg-emerald-500/10">
-              <HugeiconsIcon icon={WorkflowSquare10Icon} size={12} className="text-emerald-600" />
+          <div className="flex items-center gap-1.5 rounded-md border bg-card px-2 py-1.5">
+            <div className="flex size-5 items-center justify-center rounded bg-emerald-500/10">
+              <HugeiconsIcon icon={WorkflowSquare10Icon} size={10} className="text-emerald-600 dark:text-emerald-500" />
             </div>
-            <div className="flex items-baseline gap-1.5">
+            <div className="flex items-baseline gap-1">
               <span className="text-sm font-semibold">6</span>
               <span className="text-[10px] text-muted-foreground">Published</span>
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-md border bg-card px-3 py-2">
-            <div className="flex size-6 items-center justify-center rounded bg-amber-500/10">
-              <HugeiconsIcon icon={WorkflowSquare10Icon} size={12} className="text-amber-600" />
+          <div className="flex items-center gap-1.5 rounded-md border bg-card px-2 py-1.5">
+            <div className="flex size-5 items-center justify-center rounded bg-amber-500/10">
+              <HugeiconsIcon icon={WorkflowSquare10Icon} size={10} className="text-amber-600 dark:text-amber-500" />
             </div>
-            <div className="flex items-baseline gap-1.5">
+            <div className="flex items-baseline gap-1">
               <span className="text-sm font-semibold">2</span>
               <span className="text-[10px] text-muted-foreground">Drafts</span>
             </div>
@@ -77,11 +77,8 @@ export default function AppsPage() {
               <Link key={app.id} href={`/apps/${app.id}`}>
                 <div className="group flex cursor-pointer flex-col rounded-lg border bg-card p-3 transition-all hover:border-primary/50 hover:shadow-sm">
                   <div className="flex items-start justify-between">
-                    <div
-                      className="flex size-8 items-center justify-center rounded-lg"
-                      style={{ backgroundColor: `${app.color}15` }}
-                    >
-                      <HugeiconsIcon icon={Icon} size={16} style={{ color: app.color }} />
+                    <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
+                      <HugeiconsIcon icon={Icon} size={16} className="text-primary" />
                     </div>
                     <HugeiconsIcon 
                       icon={ArrowRight01Icon} 
@@ -96,12 +93,12 @@ export default function AppsPage() {
                       {workflows.length} workflow{workflows.length !== 1 ? 's' : ''}
                     </Badge>
                     {publishedCount > 0 && (
-                      <Badge className="bg-green-500/10 text-green-700 text-[10px] px-1.5 py-0">
+                      <Badge className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-[10px] px-1.5 py-0 hover:bg-emerald-500/20">
                         {publishedCount} published
                       </Badge>
                     )}
                     {draftCount > 0 && (
-                      <Badge className="bg-amber-500/10 text-amber-700 text-[10px] px-1.5 py-0">
+                      <Badge className="bg-amber-500/10 text-amber-700 dark:text-amber-400 text-[10px] px-1.5 py-0 hover:bg-amber-500/20">
                         {draftCount} draft
                       </Badge>
                     )}

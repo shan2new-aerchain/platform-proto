@@ -25,10 +25,10 @@ const stepIconMap: Record<StepType, typeof Tick02Icon> = {
 }
 
 const stepColorMap: Record<StepType, { bg: string; icon: string }> = {
-  approval: { bg: "bg-amber-50", icon: "text-amber-600" },
-  acknowledgement: { bg: "bg-blue-50", icon: "text-blue-600" },
-  review: { bg: "bg-violet-50", icon: "text-violet-600" },
-  assignment: { bg: "bg-amber-50", icon: "text-amber-600" },
+  approval: { bg: "bg-emerald-500/10", icon: "text-emerald-600 dark:text-emerald-500" },
+  acknowledgement: { bg: "bg-blue-500/10", icon: "text-blue-600 dark:text-blue-500" },
+  review: { bg: "bg-amber-500/10", icon: "text-amber-600 dark:text-amber-500" },
+  assignment: { bg: "bg-purple-500/10", icon: "text-purple-600 dark:text-purple-500" },
 }
 
 interface StepNodeProps {

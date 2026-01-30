@@ -87,7 +87,6 @@ export const apps: App[] = [
     name: 'Vendor Management',
     description: 'Vendor onboarding and lifecycle',
     icon: 'Building03Icon',
-    defaultActions: [],
     color: '#9333ea',
     entityTypes: ['vendor'],
     workflowCount: 2,

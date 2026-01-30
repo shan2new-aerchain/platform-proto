@@ -211,7 +211,7 @@ export function FlowCanvas({
         fitViewOptions={{ padding: 0.2 }}
         minZoom={0.5}
         maxZoom={1.5}
-        defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+        defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
         proOptions={{ hideAttribution: true }}
         nodesDraggable={false}
         nodesConnectable={false}

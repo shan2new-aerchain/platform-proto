@@ -28,10 +28,10 @@ const stepIconMap: Record<StepType, typeof Tick02Icon> = {
 }
 
 const stepColorMap: Record<StepType, string> = {
-  approval: "bg-emerald-500/10 text-emerald-600 border-emerald-200",
-  acknowledgement: "bg-blue-500/10 text-blue-600 border-blue-200",
-  review: "bg-violet-500/10 text-violet-600 border-violet-200",
-  assignment: "bg-amber-500/10 text-amber-600 border-amber-200",
+  approval: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border-emerald-200 dark:border-emerald-500/20",
+  acknowledgement: "bg-blue-500/10 text-blue-600 dark:text-blue-500 border-blue-200 dark:border-blue-500/20",
+  review: "bg-amber-500/10 text-amber-600 dark:text-amber-500 border-amber-200 dark:border-amber-500/20",
+  assignment: "bg-purple-500/10 text-purple-600 dark:text-purple-500 border-purple-200 dark:border-purple-500/20",
 }
 
 interface WorkflowCanvasProps {
@@ -126,8 +126,8 @@ function StartEndNode({ type }: { type: "start" | "end" }) {
       className={cn(
         "flex size-12 items-center justify-center rounded-full text-xs font-medium",
         type === "start"
-          ? "bg-emerald-500 text-white"
-          : "bg-stone-800 text-white"
+          ? "bg-emerald-500 text-white dark:bg-emerald-600"
+          : "bg-slate-500 text-white dark:bg-slate-600"
       )}
     >
       {type === "start" ? "Start" : "End"}
@@ -151,7 +151,7 @@ export function WorkflowCanvas({
   onSelectStep,
   onAddStep,
 }: WorkflowCanvasProps) {
-  const [zoom, setZoom] = useState(100)
+  const [zoom, setZoom] = useState(80)
   const [showGrid, setShowGrid] = useState(true)
 
   return (

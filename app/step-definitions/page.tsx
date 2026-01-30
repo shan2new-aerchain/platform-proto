@@ -1,11 +1,17 @@
 import { SiteHeader } from "@/components/site-header"
 import { Badge } from "@/components/ui/badge"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
   Tick02Icon,
   ThumbsUpIcon,
   ViewIcon,
   UserAdd01Icon,
+  InformationCircleIcon,
 } from "@hugeicons/core-free-icons"
 import { stepDefinitions } from "@/lib/mock-data"
 import type { StepType } from "@/lib/workflow-types"
@@ -38,19 +44,36 @@ export default function StepDefinitionsPage() {
             const Icon = stepIconMap[definition.type]
 
             return (
-              <div 
-                key={definition.id} 
-                className="flex flex-col rounded-lg border bg-card p-3"
+              <div
+                key={definition.id}
+                className={cn(
+                  "flex flex-col rounded-lg border bg-card p-3",
+                  "transition-all duration-200",
+                  "hover:border-primary/30 hover:shadow-md"
+                )}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex size-8 items-center justify-center rounded-lg bg-muted">
                     <HugeiconsIcon icon={Icon} size={16} className="text-foreground" />
                   </div>
                 </div>
-                <h3 className="mt-2 text-sm font-medium">{definition.name}</h3>
-                <p className="mt-0.5 text-[11px] text-muted-foreground line-clamp-1">
-                  {definition.description}
-                </p>
+                <div className="mt-2 flex items-center gap-1.5">
+                  <h3 className="text-sm font-medium">{definition.name}</h3>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        className="shrink-0 rounded-full text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                        aria-label="Step type description"
+                      >
+                        <HugeiconsIcon icon={InformationCircleIcon} size={14} />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-[240px]">
+                      {definition.description}
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 
                 {/* Default Actions */}
                 <div className="mt-2 flex flex-wrap gap-1">

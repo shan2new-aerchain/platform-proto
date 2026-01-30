@@ -34,6 +34,11 @@ export default async function WorkflowsPage({
     })
   }
 
+  const displayName = (workflowName: string) => {
+    const prefix = `${app.name} `
+    return workflowName.startsWith(prefix) ? workflowName.slice(prefix.length) : workflowName
+  }
+
   return (
     <div className="flex flex-col">
       <SiteHeader
@@ -72,9 +77,9 @@ export default async function WorkflowsPage({
                       <div
                         className={`flex size-8 shrink-0 items-center justify-center rounded-lg ${
                           workflow.status === 'published'
-                            ? 'bg-green-500/10'
+                            ? 'bg-primary/10'
                             : workflow.status === 'draft'
-                            ? 'bg-amber-500/10'
+                            ? 'bg-muted'
                             : 'bg-muted'
                         }`}
                       >
@@ -83,9 +88,9 @@ export default async function WorkflowsPage({
                           size={14}
                           className={
                             workflow.status === 'published'
-                              ? 'text-green-600'
+                              ? 'text-primary'
                               : workflow.status === 'draft'
-                              ? 'text-amber-600'
+                              ? 'text-muted-foreground'
                               : 'text-muted-foreground'
                           }
                         />
@@ -93,13 +98,13 @@ export default async function WorkflowsPage({
                       
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <h3 className="text-sm font-medium truncate">{workflow.name}</h3>
+                          <h3 className="text-sm font-medium truncate">{displayName(workflow.name)}</h3>
                           <Badge
                             className={`text-[10px] px-1.5 py-0 capitalize ${
                               workflow.status === 'published'
-                                ? 'bg-green-500/10 text-green-700'
+                                ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20'
                                 : workflow.status === 'draft'
-                                ? 'bg-amber-500/10 text-amber-700'
+                                ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20'
                                 : ''
                             }`}
                             variant="secondary"
@@ -108,9 +113,6 @@ export default async function WorkflowsPage({
                           </Badge>
                           <span className="text-[10px] text-muted-foreground">{workflow.version}</span>
                         </div>
-                        <p className="mt-1 text-[11px] text-muted-foreground line-clamp-1">
-                          {workflow.description}
-                        </p>
                         <div className="mt-1 flex items-center gap-2">
                           <span className="text-[10px] text-muted-foreground">
                             {workflow.steps.length} step{workflow.steps.length !== 1 ? 's' : ''}

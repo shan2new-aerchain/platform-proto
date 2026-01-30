@@ -15,16 +15,35 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
   DashboardSquare01Icon,
   LayersLogoIcon,
   Settings02Icon,
   HelpCircleIcon,
-  ArrowRight01Icon,
+  Logout03Icon,
+  PaintBrush02Icon,
+  SunIcon,
+  MoonIcon,
+  ComputerIcon,
+  ChevronUp,
 } from "@hugeicons/core-free-icons"
 import { useAuth } from "@/lib/auth-context"
+import { useTheme } from "@/components/theme-provider"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const navigation = [
   {
@@ -42,31 +61,17 @@ const navigation = [
       },
     ],
   },
-  {
-    title: "Settings",
-    items: [
-      {
-        title: "Settings",
-        url: "/settings",
-        icon: Settings02Icon,
-      },
-      {
-        title: "Help",
-        url: "/help",
-        icon: HelpCircleIcon,
-      },
-    ],
-  },
 ]
 
 export function AppSidebar() {
   const pathname = usePathname()
   const { logout } = useAuth()
+  const { theme, setTheme } = useTheme()
 
   return (
     <Sidebar>
-      <SidebarHeader className="h-10 border-b border-sidebar-border px-3 flex items-center">
-        <Link href="/" className="flex items-center gap-2">
+      <SidebarHeader className="h-10 px-3 flex flex-row items-center justify-start">
+        <Link href="/" className="flex items-center gap-2 min-w-0">
           <Image src="/logo.svg" alt="Aerchain" width={20} height={20} />
           <div className="flex flex-col leading-none">
             <span className="text-sm font-semibold">Workflows</span>
@@ -103,17 +108,80 @@ export function AppSidebar() {
           </SidebarGroup>
         ))}
       </SidebarContent>
-      <SidebarFooter className="border-t border-sidebar-border p-3 flex flex-col gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={logout}
-          className="w-full justify-start h-6"
-        >
-          <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
-          <span>Logout</span>
-        </Button>
-        <span className="text-[10px] text-muted-foreground">v1.0.0</span>
+      <SidebarFooter className="border-t border-sidebar-border p-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
+              <div className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm ring-1 ring-border/50">
+                <span className="text-[11px] font-medium tracking-tight tabular-nums">A</span>
+              </div>
+              <div className="flex flex-col flex-1 min-w-0">
+                <span className="text-xs font-medium truncate">Admin</span>
+                <span className="text-[10px] text-muted-foreground truncate">admin@aerchain.com</span>
+              </div>
+              <HugeiconsIcon icon={ChevronUp} size={14} className="text-muted-foreground shrink-0" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="top" align="start" className="w-56">
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex items-center gap-2">
+                <div className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm ring-1 ring-border/50">
+                  <span className="text-[11px] font-medium tracking-tight tabular-nums">A</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs font-medium">Admin</span>
+                  <span className="text-[10px] text-muted-foreground">admin@aerchain.com</span>
+                </div>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem asChild>
+                <Link href="/settings">
+                  <HugeiconsIcon icon={Settings02Icon} size={14} />
+                  Settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/help">
+                  <HugeiconsIcon icon={HelpCircleIcon} size={14} />
+                  Help
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <HugeiconsIcon icon={PaintBrush02Icon} size={14} />
+                  Theme
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as "light" | "dark" | "system")}>
+                    <DropdownMenuRadioItem value="light">
+                      <HugeiconsIcon icon={SunIcon} size={14} />
+                      Light
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="dark">
+                      <HugeiconsIcon icon={MoonIcon} size={14} />
+                      Dark
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="system">
+                      <HugeiconsIcon icon={ComputerIcon} size={14} />
+                      System
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={logout}>
+              <HugeiconsIcon icon={Logout03Icon} size={14} />
+              Logout
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-[10px] text-muted-foreground/60 font-normal">
+              Version 5.0.0
+            </DropdownMenuLabel>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </SidebarFooter>
     </Sidebar>
   )
