@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { useCanvasDialogContainer } from "./flow-canvas"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
   Tick02Icon,
@@ -41,9 +42,11 @@ export function AddStepDialog({
     onOpenChange(false)
   }
 
+  const canvasContainer = useCanvasDialogContainer()
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent container={canvasContainer ?? undefined} className="sm:max-w-md">
         <DialogHeader className="gap-1">
           <DialogTitle>Add a Step</DialogTitle>
           <DialogDescription>

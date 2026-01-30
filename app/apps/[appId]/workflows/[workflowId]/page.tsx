@@ -141,24 +141,23 @@ export default function WorkflowBuilderPage({
             onSelectStep={setSelectedStepId}
             onAddStep={() => setShowAddStepDialog(true)}
             onUpdateWorkflow={setWorkflow}
-          />
+          >
+            <StepConfigSheet
+              step={selectedStep}
+              open={!!selectedStep}
+              onOpenChange={(open) => {
+                if (!open) setSelectedStepId(null)
+              }}
+              onUpdate={handleUpdateStep}
+            />
+            <AddStepDialog
+              open={showAddStepDialog}
+              onOpenChange={setShowAddStepDialog}
+              onSelectStepType={handleAddStep}
+            />
+          </FlowCanvas>
         </ReactFlowProvider>
-
-        <StepConfigSheet
-          step={selectedStep}
-          open={!!selectedStep}
-          onOpenChange={(open) => {
-            if (!open) setSelectedStepId(null)
-          }}
-          onUpdate={handleUpdateStep}
-        />
       </div>
-
-      <AddStepDialog
-        open={showAddStepDialog}
-        onOpenChange={setShowAddStepDialog}
-        onSelectStepType={handleAddStep}
-      />
     </div>
   )
 }

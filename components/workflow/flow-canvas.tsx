@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useMemo, useEffect } from "react"
+import { useCallback, useMemo, useEffect, useState, createContext, useContext, type ReactNode } from "react"
 import {
   ReactFlow,
   Background,
@@ -19,12 +19,21 @@ import { StartEndNode } from "./start-end-node"
 import { AddNodeButton } from "./add-node-button"
 import type { WorkflowDefinition } from "@/lib/workflow-types"
 
+/** Context for the canvas container so dialogs can portal into it and center to the canvas. */
+const CanvasDialogContainerContext = createContext<HTMLElement | null>(null)
+
+export function useCanvasDialogContainer() {
+  return useContext(CanvasDialogContainerContext)
+}
+
 interface FlowCanvasProps {
   workflow: WorkflowDefinition
   selectedStepId: string | null
   onSelectStep: (stepId: string | null) => void
   onAddStep: () => void
   onUpdateWorkflow: (workflow: WorkflowDefinition) => void
+  /** Dialogs rendered here will be centered to the canvas (portaled into canvas container). */
+  children?: ReactNode
 }
 
 const nodeTypes = {
@@ -38,6 +47,7 @@ export function FlowCanvas({
   selectedStepId,
   onSelectStep,
   onAddStep,
+  children,
 }: FlowCanvasProps) {
   // Convert workflow steps to React Flow nodes
   const { nodes: initialNodes, edges: initialEdges } = useMemo(() => {
@@ -197,9 +207,19 @@ export function FlowCanvas({
     }
   }, [onSelectStep])
 
+  const [container, setContainer] = useState<HTMLElement | null>(null)
+  const setContainerRef = useCallback((el: HTMLDivElement | null) => {
+    setContainer(el)
+  }, [])
+
   return (
-    <div className="h-full w-full">
-      <ReactFlow
+    <CanvasDialogContainerContext.Provider value={container}>
+      <div
+        ref={setContainerRef}
+        className="h-full w-full"
+        style={{ transform: "translateZ(0)" }}
+      >
+        <ReactFlow
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
@@ -224,6 +244,8 @@ export function FlowCanvas({
           showInteractive={false} 
         />
       </ReactFlow>
-    </div>
+      </div>
+      {children}
+    </CanvasDialogContainerContext.Provider>
   )
 }

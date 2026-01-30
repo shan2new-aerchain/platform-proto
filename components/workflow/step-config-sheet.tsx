@@ -8,6 +8,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { useCanvasDialogContainer } from "./flow-canvas"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
@@ -149,6 +150,8 @@ export function StepConfigSheet({
   onOpenChange,
   onUpdate,
 }: StepConfigSheetProps) {
+  const canvasContainer = useCanvasDialogContainer()
+
   if (!step) return null
 
   const Icon = stepIconMap[step.type]
@@ -198,6 +201,7 @@ export function StepConfigSheet({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        container={canvasContainer ?? undefined}
         className={cn(
           // Keep a stable, responsive dialog size without forcing full-width.
           "w-[min(36rem,calc(100vw-2rem))] sm:max-w-none",
