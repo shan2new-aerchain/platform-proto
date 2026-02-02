@@ -10,6 +10,12 @@ const nextConfig: NextConfig = {
   // Optimize images
   images: {
     unoptimized: false,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'i.pinimg.com',
+      },
+    ],
   },
   
   // Ensure proper routing for dynamic segments

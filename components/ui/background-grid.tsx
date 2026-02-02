@@ -28,11 +28,11 @@ export function BackgroundDots({
   containerClassName?: string
 }) {
   return (
-    <div className={cn("absolute inset-0 overflow-hidden", containerClassName)}>
+    <div className={cn("absolute inset-0 overflow-hidden pointer-events-none", containerClassName)}>
       <div
         className={cn(
-          "absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[16px_16px] mask-[radial-gradient(ellipse_50%_50%_at_50%_50%,#000_60%,transparent_100%)]",
-          "dark:bg-[radial-gradient(rgba(255,255,255,0.1)_1px,transparent_1px)]",
+          "absolute inset-0 bg-[radial-gradient(rgba(0,0,0,0.03)_1px,transparent_1px)] bg-size-[16px_16px]",
+          "dark:bg-[radial-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)]",
           className
         )}
       />

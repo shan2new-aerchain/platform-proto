@@ -1,0 +1,76 @@
+"use client"
+
+import * as React from "react"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { RoleMultiSelectCombobox } from "./step-config-panel"
+import type { Step } from "@/lib/workflow-types"
+import { useCanvasDialogContainer } from "./flow-canvas"
+
+interface ActorsRoleGroupsDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  step: Step
+  onUpdate: (step: Step) => void
+}
+
+export function ActorsRoleGroupsDialog({
+  open,
+  onOpenChange,
+  step,
+  onUpdate,
+}: ActorsRoleGroupsDialogProps) {
+  const canvasContainer = useCanvasDialogContainer()
+
+  const updateActors = (updates: Partial<typeof step.config.actors>) => {
+    onUpdate({
+      ...step,
+      config: {
+        ...step.config,
+        actors: { ...step.config.actors, ...updates },
+      },
+    })
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        container={canvasContainer ?? undefined}
+        className="w-[min(32rem,calc(100vw-2rem))] sm:max-w-none"
+      >
+        <DialogHeader>
+          <DialogTitle>Assign by role</DialogTitle>
+          <DialogDescription>
+            Choose which role groups can act on this step.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <span className="text-xs font-medium text-muted-foreground">Select roles</span>
+            <div className="mt-2">
+              <RoleMultiSelectCombobox
+                selectedRoleIds={step.config.actors.roleIds || []}
+                onSelectedRoleIdsChange={(roleIds) => updateActors({ roleIds })}
+                placeholder="Search roles…"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-end gap-2 pt-2">
+          <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button size="sm" onClick={() => onOpenChange(false)}>
+            Done
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}

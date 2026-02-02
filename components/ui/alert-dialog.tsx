@@ -44,12 +44,15 @@ function AlertDialogOverlay({
 function AlertDialogContent({
   className,
   size = "default",
+  container,
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Content> & {
   size?: "default" | "sm"
+  /** When set, dialog is portaled here so it centers to that element. */
+  container?: HTMLElement | null
 }) {
   return (
-    <AlertDialogPortal>
+    <AlertDialogPortal container={container ?? undefined}>
       <AlertDialogOverlay />
       <AlertDialogPrimitive.Content
         data-slot="alert-dialog-content"

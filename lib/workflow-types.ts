@@ -8,6 +8,10 @@ export interface StepDefinition {
   description: string
   icon: string
   defaultActions: string[]
+  /** Label for who can act on this step (e.g. Approvers, Purchasers, Acknowledgers). Shown in graph and config. */
+  actorsLabel: string
+  /** Short description for the actors section (e.g. Who can approve this step). */
+  actorsDescription: string
   configSchema: {
     supportsCompletion: boolean
     supportsReassignment: boolean
@@ -23,6 +27,7 @@ export interface ActorConfig {
   userIds?: string[]
   roleIds?: string[]
   dynamicRule?: string
+  dynamicRules?: ConditionRule[]
   allowReassignment: boolean
   reassignmentType?: AssignmentType
   reassignmentRoleIds?: string[]
@@ -114,6 +119,15 @@ export interface WorkflowDefinition {
   updatedAt: string
 }
 
+// App categories for organizing workflow consumers
+export type AppCategory = 
+  | 'source-to-pay'      // Core procurement flow (Requisition, Invoice, Contract, etc.)
+  | 'vendor-management'  // Vendor onboarding and lifecycle
+  | 'master-data'        // Other master data management (Supplier, Category, etc.)
+  | 'expense'            // Expense and travel management
+  | 'asset'              // Asset lifecycle management
+  | 'hr'                 // HR and employee workflows
+
 // App type for grouping workflows
 export interface App {
   id: string
@@ -121,6 +135,7 @@ export interface App {
   description: string
   icon: string
   color: string
+  category: AppCategory
   entityTypes: string[]
   workflowCount: number
 }

@@ -9,12 +9,11 @@ import {
   ViewIcon,
   UserAdd01Icon,
   UserGroupIcon,
-  GitCompareIcon,
   Notification02Icon,
   ViewOffSlashIcon,
 } from "@hugeicons/core-free-icons"
 import type { Step, StepType } from "@/lib/workflow-types"
-import { roles } from "@/lib/mock-data"
+import { getStepDefinitionById, roles, users } from "@/lib/mock-data"
 import { cn } from "@/lib/utils"
 
 const stepIconMap: Record<StepType, typeof Tick02Icon> = {
@@ -35,25 +34,44 @@ interface StepNodeProps {
   data: {
     step: Step
     isSelected: boolean
+    onOpenStepConfig?: (stepId: string, focus: import("./step-config-sheet").StepConfigFocus) => void
   }
 }
 
 export const StepNode = memo(function StepNode({ data }: StepNodeProps) {
-  const { step, isSelected } = data
+  const { step, isSelected, onOpenStepConfig } = data
   const Icon = stepIconMap[step.type]
   const colors = stepColorMap[step.type]
 
-  const assignmentLabel =
-    step.config.actors.assignmentType === "roles" && step.config.actors.roleIds && step.config.actors.roleIds.length > 0
-      ? step.config.actors.roleIds
-          .map((id) => roles.find((r) => r.id === id)?.name || id)
-          .join(", ")
-      : "No users / roles are added"
+  const assignmentLabel = (() => {
+    if (step.config.actors.assignmentType === "roles") {
+      const roleNames = (step.config.actors.roleIds || [])
+        .map((id) => roles.find((r) => r.id === id)?.name || id)
+        .join(", ")
+      return roleNames || "No roles selected"
+    }
+    if (step.config.actors.assignmentType === "specific_users") {
+      const userNames = (step.config.actors.userIds || [])
+        .map((id) => users.find((u) => u.id === id)?.name || id)
+        .join(", ")
+      return userNames || "No users selected"
+    }
+    return step.config.actors.dynamicRules?.length ? "Dynamic rules" : "Dynamic assignment"
+  })()
 
-  const hasAssignment = step.config.actors.roleIds && step.config.actors.roleIds.length > 0
-  const hasRules = step.config.conditions.rules.length > 0
-  const hasNotifications = step.config.notifications.onEntry.notifyActors || step.config.notifications.onCompletion.notifyRequester
+  const hasAssignment =
+    (step.config.actors.roleIds && step.config.actors.roleIds.length > 0) ||
+    (step.config.actors.userIds && step.config.actors.userIds.length > 0) ||
+    (step.config.actors.dynamicRules && step.config.actors.dynamicRules.length > 0) ||
+    Boolean(step.config.actors.dynamicRule)
+  const hasNotifications =
+    step.config.notifications.onEntry.notifyActors ||
+    step.config.notifications.onEntry.notifyRequester ||
+    step.config.notifications.onCompletion.notifyRequester ||
+    step.config.notifications.onCompletion.notifyNextActors
   const hasVisibility = step.config.visibility.type === 'specific_roles'
+  const definition = getStepDefinitionById(step.definitionId)
+  const actorsLabel = definition?.actorsLabel ?? "Assignees"
 
   return (
     <>
@@ -82,25 +100,26 @@ export const StepNode = memo(function StepNode({ data }: StepNodeProps) {
 
         {/* Action Bar - Compact */}
         <div className="flex items-center justify-around border-t border-border bg-muted/50 px-1 py-1">
-          <div 
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onOpenStepConfig?.(step.id, "actors")
+            }}
             className={cn(
               "flex flex-col items-center gap-0.5 px-1.5 py-0.5 rounded",
               hasAssignment ? "text-primary" : "text-muted-foreground/60"
             )}
           >
             <HugeiconsIcon icon={UserGroupIcon} size={11} />
-            <span className="text-[8px]">Assignment</span>
-          </div>
-          <div 
-            className={cn(
-              "flex flex-col items-center gap-0.5 px-1.5 py-0.5 rounded",
-              hasRules ? "text-primary" : "text-muted-foreground/60"
-            )}
-          >
-            <HugeiconsIcon icon={GitCompareIcon} size={11} />
-            <span className="text-[8px]">Rules</span>
-          </div>
-          <div 
+            <span className="text-[8px]">{actorsLabel}</span>
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onOpenStepConfig?.(step.id, "notifications")
+            }}
             className={cn(
               "flex flex-col items-center gap-0.5 px-1.5 py-0.5 rounded",
               hasNotifications ? "text-primary" : "text-muted-foreground/60"
@@ -108,8 +127,13 @@ export const StepNode = memo(function StepNode({ data }: StepNodeProps) {
           >
             <HugeiconsIcon icon={Notification02Icon} size={11} />
             <span className="text-[8px]">Notify</span>
-          </div>
-          <div 
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onOpenStepConfig?.(step.id, "visibility")
+            }}
             className={cn(
               "flex flex-col items-center gap-0.5 px-1.5 py-0.5 rounded",
               hasVisibility ? "text-primary" : "text-muted-foreground/60"
@@ -117,7 +141,7 @@ export const StepNode = memo(function StepNode({ data }: StepNodeProps) {
           >
             <HugeiconsIcon icon={ViewOffSlashIcon} size={11} />
             <span className="text-[8px]">Visibility</span>
-          </div>
+          </button>
         </div>
       </div>
       <Handle type="source" position={Position.Bottom} className="bg-transparent! border-0! w-0! h-0!" />

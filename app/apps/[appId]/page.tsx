@@ -52,7 +52,7 @@ export default async function WorkflowsPage({
         }
       />
 
-      <div className="p-4">
+      <div className="px-4 pt-4">
         {/* Workflow Groups by Operation */}
         {(['create', 'amend', 'cancel'] as const).map((operation) => {
           const operationWorkflows = workflows.filter(
@@ -62,7 +62,7 @@ export default async function WorkflowsPage({
           if (operationWorkflows.length === 0) return null
 
           return (
-            <div key={operation} className="mb-4">
+            <div key={operation} className="mb-8">
               <div className="mb-2 flex items-center gap-2">
                 <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   {operation} Workflows
@@ -70,66 +70,62 @@ export default async function WorkflowsPage({
                 <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{operationWorkflows.length}</Badge>
               </div>
 
-              <div className="space-y-2">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
                 {operationWorkflows.map((workflow) => (
                   <Link key={workflow.id} href={`/apps/${appId}/workflows/${workflow.id}`}>
-                    <div className="group flex cursor-pointer items-center gap-3 rounded-lg border bg-card p-3 transition-all hover:border-primary/50 hover:shadow-sm">
-                      <div
-                        className={`flex size-8 shrink-0 items-center justify-center rounded-lg ${
-                          workflow.status === 'published'
-                            ? 'bg-primary/10'
-                            : workflow.status === 'draft'
-                            ? 'bg-muted'
-                            : 'bg-muted'
-                        }`}
-                      >
+                    <div className="group flex cursor-pointer flex-col gap-2 rounded-lg border bg-card p-3 transition-all hover:border-primary/50 hover:shadow-sm">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <div
+                            className={`flex size-6 shrink-0 items-center justify-center rounded-md ${
+                              workflow.status === 'published'
+                                ? 'bg-primary/10'
+                                : 'bg-muted'
+                            }`}
+                          >
+                            <HugeiconsIcon
+                              icon={GitBranchIcon}
+                              size={12}
+                              className={
+                                workflow.status === 'published'
+                                  ? 'text-primary'
+                                  : 'text-muted-foreground'
+                              }
+                            />
+                          </div>
+                          <h3 className="text-xs font-medium line-clamp-1">{displayName(workflow.name)}</h3>
+                        </div>
                         <HugeiconsIcon
-                          icon={GitBranchIcon}
+                          icon={ArrowRight01Icon}
                           size={14}
-                          className={
-                            workflow.status === 'published'
-                              ? 'text-primary'
-                              : workflow.status === 'draft'
-                              ? 'text-muted-foreground'
-                              : 'text-muted-foreground'
-                          }
+                          className="text-muted-foreground/50 transition-transform group-hover:translate-x-0.5 group-hover:text-primary shrink-0"
                         />
                       </div>
-                      
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-sm font-medium truncate">{displayName(workflow.name)}</h3>
-                          <Badge
-                            className={`text-[10px] px-1.5 py-0 capitalize ${
-                              workflow.status === 'published'
-                                ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20'
-                                : workflow.status === 'draft'
-                                ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20'
-                                : ''
-                            }`}
-                            variant="secondary"
-                          >
-                            {workflow.status}
-                          </Badge>
-                          <span className="text-[10px] text-muted-foreground">{workflow.version}</span>
-                        </div>
-                        <div className="mt-1 flex items-center gap-2">
-                          <span className="text-[10px] text-muted-foreground">
-                            {workflow.steps.length} step{workflow.steps.length !== 1 ? 's' : ''}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground">•</span>
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                            <HugeiconsIcon icon={Time02Icon} size={10} />
-                            {formatDate(workflow.updatedAt)}
-                          </span>
-                        </div>
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          className={`text-[10px] px-1.5 py-0 capitalize ${
+                            workflow.status === 'published'
+                              ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20'
+                              : workflow.status === 'draft'
+                              ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20'
+                              : ''
+                          }`}
+                          variant="secondary"
+                        >
+                          {workflow.status}
+                        </Badge>
+                        <span className="text-[10px] text-muted-foreground">{workflow.version}</span>
                       </div>
-                      
-                      <HugeiconsIcon
-                        icon={ArrowRight01Icon}
-                        size={14}
-                        className="shrink-0 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5 group-hover:text-primary"
-                      />
+                      <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                        <span>
+                          {workflow.steps.length} step{workflow.steps.length !== 1 ? 's' : ''}
+                        </span>
+                        <span>•</span>
+                        <span className="flex items-center gap-1">
+                          <HugeiconsIcon icon={Time02Icon} size={10} />
+                          {formatDate(workflow.updatedAt)}
+                        </span>
+                      </div>
                     </div>
                   </Link>
                 ))}

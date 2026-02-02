@@ -14,6 +14,7 @@ import {
   InformationCircleIcon,
 } from "@hugeicons/core-free-icons"
 import { stepDefinitions } from "@/lib/mock-data"
+import Link from "next/link"
 import type { StepType } from "@/lib/workflow-types"
 import { cn } from "@/lib/utils"
 
@@ -44,8 +45,9 @@ export default function StepDefinitionsPage() {
             const Icon = stepIconMap[definition.type]
 
             return (
-              <div
+              <Link
                 key={definition.id}
+                href={`/step-definitions/${definition.id}`}
                 className={cn(
                   "flex flex-col rounded-lg border bg-card p-3",
                   "transition-all duration-200",
@@ -105,7 +107,7 @@ export default function StepDefinitionsPage() {
                     </Badge>
                   )}
                 </div>
-              </div>
+              </Link>
             )
           })}
         </div>

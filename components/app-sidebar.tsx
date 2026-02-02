@@ -70,11 +70,11 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="h-10 px-3 flex flex-row items-center justify-start">
+      <SidebarHeader className="h-12 px-3 flex flex-row items-center justify-start">
         <Link href="/" className="flex items-center gap-2 min-w-0">
-          <Image src="/logo.svg" alt="Aerchain" width={20} height={20} />
+          <Image src="/logo.svg" alt="Aerchain" width={24} height={24} />
           <div className="flex flex-col leading-none">
-            <span className="text-sm font-semibold">Workflows</span>
+            <span className="text-lg font-semibold font-brand">Workflows</span>
           </div>
         </Link>
       </SidebarHeader>
@@ -108,16 +108,23 @@ export function AppSidebar() {
           </SidebarGroup>
         ))}
       </SidebarContent>
-      <SidebarFooter className="border-t border-sidebar-border p-2">
+      <SidebarFooter className="border-t border-sidebar-border p-1">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
-              <div className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm ring-1 ring-border/50">
-                <span className="text-[11px] font-medium tracking-tight tabular-nums">A</span>
+            <button className="flex w-full items-center gap-2 rounded-md px-2 py-1 text-left hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
+              <div className="size-8 rounded-full overflow-hidden shadow-sm ring-1 ring-border/50">
+                <img
+                  src="/gojo-avatar.jpg"
+                  alt="Profile"
+                  width={32}
+                  height={32}
+                  className="object-cover w-full h-full"
+                  style={{ objectPosition: '50% 30%' }}
+                />
               </div>
               <div className="flex flex-col flex-1 min-w-0">
-                <span className="text-xs font-medium truncate">Admin</span>
-                <span className="text-[10px] text-muted-foreground truncate">admin@aerchain.com</span>
+                <span className="text-xs font-medium truncate">Gojo Satoru</span>
+                <span className="text-[10px] text-muted-foreground truncate">gojo@aerchain.com</span>
               </div>
               <HugeiconsIcon icon={ChevronUp} size={14} className="text-muted-foreground shrink-0" />
             </button>
@@ -125,12 +132,19 @@ export function AppSidebar() {
           <DropdownMenuContent side="top" align="start" className="w-56">
             <DropdownMenuLabel className="font-normal">
               <div className="flex items-center gap-2">
-                <div className="flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm ring-1 ring-border/50">
-                  <span className="text-[11px] font-medium tracking-tight tabular-nums">A</span>
+                <div className="size-8 rounded-full overflow-hidden shadow-sm ring-1 ring-border/50">
+                  <img
+                    src="/gojo-avatar.jpg"
+                    alt="Profile"
+                    width={32}
+                    height={32}
+                    className="object-cover w-full h-full"
+                    style={{ objectPosition: '50% 30%' }}
+                  />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xs font-medium">Admin</span>
-                  <span className="text-[10px] text-muted-foreground">admin@aerchain.com</span>
+                  <span className="text-xs font-medium">Gojo Satoru</span>
+                  <span className="text-[10px] text-muted-foreground">gojo@aerchain.com</span>
                 </div>
               </div>
             </DropdownMenuLabel>

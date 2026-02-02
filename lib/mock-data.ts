@@ -1,10 +1,45 @@
 import type {
   App,
+  AppCategory,
   Role,
   StepDefinition,
   User,
   WorkflowDefinition,
 } from './workflow-types'
+
+// Category metadata
+export const appCategoryMetadata: Record<AppCategory, { label: string; description: string; order: number }> = {
+  'source-to-pay': {
+    label: 'Source-to-Pay',
+    description: 'Core procurement business process apps',
+    order: 1,
+  },
+  'vendor-management': {
+    label: 'Vendor Management',
+    description: 'Vendor onboarding and lifecycle management',
+    order: 2,
+  },
+  'master-data': {
+    label: 'Master Data',
+    description: 'Master data management workflows',
+    order: 3,
+  },
+  'expense': {
+    label: 'Expense & Travel',
+    description: 'Expense and travel management',
+    order: 4,
+  },
+  'asset': {
+    label: 'Asset Management',
+    description: 'Asset lifecycle workflows',
+    order: 5,
+  },
+  'hr': {
+    label: 'HR & Employee',
+    description: 'HR and employee workflows',
+    order: 6,
+  },
+}
 
 // Platform-owned Step Definitions
 export const stepDefinitions: StepDefinition[] = [
@@ -15,6 +50,8 @@ export const stepDefinitions: StepDefinition[] = [
     description: 'Requires one or more actors to approve or reject',
     icon: 'Tick02Icon',
     defaultActions: ['approve', 'reject', 'return'],
+    actorsLabel: 'Approvers',
+    actorsDescription: 'Who can approve this step',
     configSchema: {
       supportsCompletion: true,
       supportsReassignment: true,
@@ -28,6 +65,8 @@ export const stepDefinitions: StepDefinition[] = [
     description: 'Requires actors to acknowledge they have seen the item',
     icon: 'ThumbsUpIcon',
     defaultActions: ['acknowledge'],
+    actorsLabel: 'Acknowledgers',
+    actorsDescription: 'Who must acknowledge this step',
     configSchema: {
       supportsCompletion: true,
       supportsReassignment: false,
@@ -41,6 +80,8 @@ export const stepDefinitions: StepDefinition[] = [
     description: 'Allows actors to review and provide feedback',
     icon: 'ViewIcon',
     defaultActions: ['submit_review', 'request_info'],
+    actorsLabel: 'Reviewers',
+    actorsDescription: 'Who can review this step',
     configSchema: {
       supportsCompletion: true,
       supportsReassignment: true,
@@ -54,6 +95,23 @@ export const stepDefinitions: StepDefinition[] = [
     description: 'Allows eligible actors to claim ownership',
     icon: 'UserAdd01Icon',
     defaultActions: ['claim', 'release', 'reassign'],
+    actorsLabel: 'Assignees',
+    actorsDescription: 'Who can claim this step',
+    configSchema: {
+      supportsCompletion: false,
+      supportsReassignment: true,
+      supportsTimeout: true,
+    },
+  },
+  {
+    id: 'purchaser_assignment',
+    type: 'assignment',
+    name: 'Purchaser Assignment',
+    description: 'Assigns to a purchaser (e.g. by category or pool)',
+    icon: 'UserAdd01Icon',
+    defaultActions: ['claim', 'release', 'reassign'],
+    actorsLabel: 'Purchasers',
+    actorsDescription: 'Who can be assigned as purchaser',
     configSchema: {
       supportsCompletion: false,
       supportsReassignment: true,
@@ -62,16 +120,78 @@ export const stepDefinitions: StepDefinition[] = [
   },
 ]
 
-// Sample Apps
+// Sample Apps - Based on actual Jarvis system apps
 export const apps: App[] = [
+  // Source-to-Pay Apps
   {
     id: 'requisition',
     name: 'Requisition',
     description: 'Purchase requisition management',
     icon: 'ShoppingCart01Icon',
     color: '#ea580c',
+    category: 'source-to-pay',
     entityTypes: ['requisition'],
     workflowCount: 3,
+  },
+  {
+    id: 'intake',
+    name: 'Intake',
+    description: 'Intake request management',
+    icon: 'InboxIcon',
+    color: '#f59e0b',
+    category: 'source-to-pay',
+    entityTypes: ['intake'],
+    workflowCount: 0,
+  },
+  {
+    id: 'quote-request',
+    name: 'QuoteRequest',
+    description: 'Request for quotation and sourcing',
+    icon: 'FileSearchIcon',
+    color: '#8b5cf6',
+    category: 'source-to-pay',
+    entityTypes: ['quote_request'],
+    workflowCount: 0,
+  },
+  {
+    id: 'negotiation-request',
+    name: 'NegotiationRequest',
+    description: 'Supplier negotiation and bidding',
+    icon: 'MessageMultiple02Icon',
+    color: '#6366f1',
+    category: 'source-to-pay',
+    entityTypes: ['negotiation_request'],
+    workflowCount: 0,
+  },
+  {
+    id: 'purchase-order',
+    name: 'Purchase Order',
+    description: 'Purchase order creation and management',
+    icon: 'ShoppingBasket01Icon',
+    color: '#14b8a6',
+    category: 'source-to-pay',
+    entityTypes: ['purchase_order'],
+    workflowCount: 0,
+  },
+  {
+    id: 'grn',
+    name: 'GRN',
+    description: 'Goods receipt note processing',
+    icon: 'PackageIcon',
+    color: '#10b981',
+    category: 'source-to-pay',
+    entityTypes: ['grn'],
+    workflowCount: 0,
+  },
+  {
+    id: 'qc',
+    name: 'QC',
+    description: 'Quality control and inspection',
+    icon: 'CheckmarkBadge01Icon',
+    color: '#059669',
+    category: 'source-to-pay',
+    entityTypes: ['qc'],
+    workflowCount: 0,
   },
   {
     id: 'invoice',
@@ -79,26 +199,103 @@ export const apps: App[] = [
     description: 'Invoice processing and approval',
     icon: 'Invoice01Icon',
     color: '#16a34a',
+    category: 'source-to-pay',
     entityTypes: ['invoice'],
     workflowCount: 2,
   },
   {
-    id: 'vendor',
-    name: 'Vendor Management',
-    description: 'Vendor onboarding and lifecycle',
-    icon: 'Building03Icon',
-    color: '#9333ea',
-    entityTypes: ['vendor'],
-    workflowCount: 2,
+    id: 'payment',
+    name: 'Payment',
+    description: 'Payment processing and approval',
+    icon: 'Wallet02Icon',
+    color: '#84cc16',
+    category: 'source-to-pay',
+    entityTypes: ['payment'],
+    workflowCount: 0,
+  },
+  {
+    id: 'advance',
+    name: 'Advance',
+    description: 'Advance payment requests',
+    icon: 'MoneyBag01Icon',
+    color: '#eab308',
+    category: 'source-to-pay',
+    entityTypes: ['advance'],
+    workflowCount: 0,
+  },
+  {
+    id: 'rate-contracts',
+    name: 'Rate Contracts',
+    description: 'Rate contract creation and management',
+    icon: 'File01Icon',
+    color: '#0ea5e9',
+    category: 'source-to-pay',
+    entityTypes: ['rate_contract'],
+    workflowCount: 0,
   },
   {
     id: 'contract',
     name: 'Contract',
     description: 'Contract approval and management',
     icon: 'File01Icon',
-    color: '#0ea5e9',
+    color: '#3b82f6',
+    category: 'source-to-pay',
     entityTypes: ['contract'],
     workflowCount: 1,
+  },
+  {
+    id: 'boq',
+    name: 'BOQ',
+    description: 'Bill of quantities management',
+    icon: 'FileSearchIcon',
+    color: '#06b6d4',
+    category: 'source-to-pay',
+    entityTypes: ['boq'],
+    workflowCount: 0,
+  },
+  {
+    id: 'prc',
+    name: 'PRC',
+    description: 'Purchase request for change',
+    icon: 'Edit02Icon',
+    color: '#64748b',
+    category: 'source-to-pay',
+    entityTypes: ['prc'],
+    workflowCount: 0,
+  },
+  
+  // Vendor Management Apps
+  {
+    id: 'supplier',
+    name: 'Supplier',
+    description: 'Supplier master data management',
+    icon: 'Building03Icon',
+    color: '#9333ea',
+    category: 'vendor-management',
+    entityTypes: ['supplier'],
+    workflowCount: 0,
+  },
+  {
+    id: 'supplier-onboarding',
+    name: 'Supplier Onboarding',
+    description: 'New supplier onboarding workflow',
+    icon: 'UserAdd02Icon',
+    color: '#a855f7',
+    category: 'vendor-management',
+    entityTypes: ['supplier_onboarding'],
+    workflowCount: 2,
+  },
+  
+  // Master Data Apps
+  {
+    id: 'product',
+    name: 'Product',
+    description: 'Product master data management',
+    icon: 'PackageIcon',
+    color: '#ec4899',
+    category: 'master-data',
+    entityTypes: ['product'],
+    workflowCount: 0,
   },
 ]
 
@@ -178,6 +375,14 @@ export const workflowDefinitions: WorkflowDefinition[] = [
           actors: {
             assignmentType: 'dynamic',
             dynamicRule: 'purchaser-pool-by-category',
+            dynamicRules: [
+              {
+                id: 'rule-dynamic-1',
+                field: 'category',
+                operator: 'equals',
+                value: 'Indirect',
+              },
+            ],
             allowReassignment: true,
             reassignmentType: 'roles',
             reassignmentRoleIds: ['purchaser'],
@@ -425,14 +630,14 @@ export const workflowDefinitions: WorkflowDefinition[] = [
       { id: 'tr-3', fromStepId: 'step-1', toStepId: 'end', action: 'reject' },
     ],
   },
-  // Vendor Onboarding Workflow
+  // Supplier Onboarding Workflow
   {
-    id: 'vendor-onboard-wf',
-    name: 'Vendor Onboarding Workflow',
-    description: 'Complete vendor onboarding process',
+    id: 'supplier-onboard-wf',
+    name: 'Supplier Onboarding Workflow',
+    description: 'Complete supplier onboarding process',
     version: 'v2.0',
-    appId: 'vendor',
-    entityType: 'vendor',
+    appId: 'supplier-onboarding',
+    entityType: 'supplier',
     operation: 'create',
     status: 'published',
     createdAt: '2025-01-05T10:00:00Z',
@@ -512,14 +717,14 @@ export const workflowDefinitions: WorkflowDefinition[] = [
       { id: 'tr-7', fromStepId: 'step-3', toStepId: 'end', action: 'reject' },
     ],
   },
-  // Vendor Lifecycle Workflow
+  // Supplier Lifecycle Workflow
   {
-    id: 'vendor-lifecycle-wf',
-    name: 'Vendor Status Change Workflow',
-    description: 'Workflow for vendor status changes',
+    id: 'supplier-lifecycle-wf',
+    name: 'Supplier Status Change Workflow',
+    description: 'Workflow for supplier status changes',
     version: 'v1.0',
-    appId: 'vendor',
-    entityType: 'vendor',
+    appId: 'supplier-onboarding',
+    entityType: 'supplier',
     operation: 'amend',
     status: 'published',
     createdAt: '2025-01-12T10:00:00Z',
@@ -663,4 +868,23 @@ export const getRoleById = (roleId: string): Role | undefined => {
 
 export const getUserById = (userId: string): User | undefined => {
   return users.find((u) => u.id === userId)
+}
+
+export const getAppsByCategory = (): Record<AppCategory, App[]> => {
+  const grouped = apps.reduce((acc, app) => {
+    if (!acc[app.category]) {
+      acc[app.category] = []
+    }
+    acc[app.category].push(app)
+    return acc
+  }, {} as Record<AppCategory, App[]>)
+  
+  return grouped
+}
+
+export const getActiveCategories = (): AppCategory[] => {
+  const categories = new Set(apps.map(app => app.category))
+  return Array.from(categories).sort((a, b) => 
+    appCategoryMetadata[a].order - appCategoryMetadata[b].order
+  )
 }

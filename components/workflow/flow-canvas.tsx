@@ -18,6 +18,7 @@ import { StepNode } from "./step-node"
 import { StartEndNode } from "./start-end-node"
 import { AddNodeButton } from "./add-node-button"
 import type { WorkflowDefinition } from "@/lib/workflow-types"
+import type { StepConfigFocus } from "./step-config-sheet"
 
 /** Context for the canvas container so dialogs can portal into it and center to the canvas. */
 const CanvasDialogContainerContext = createContext<HTMLElement | null>(null)
@@ -30,6 +31,7 @@ interface FlowCanvasProps {
   workflow: WorkflowDefinition
   selectedStepId: string | null
   onSelectStep: (stepId: string | null) => void
+  onOpenStepConfig?: (stepId: string, focus: StepConfigFocus) => void
   onAddStep: () => void
   onUpdateWorkflow: (workflow: WorkflowDefinition) => void
   /** Dialogs rendered here will be centered to the canvas (portaled into canvas container). */
@@ -46,6 +48,7 @@ export function FlowCanvas({
   workflow,
   selectedStepId,
   onSelectStep,
+  onOpenStepConfig,
   onAddStep,
   children,
 }: FlowCanvasProps) {
@@ -140,6 +143,7 @@ export function FlowCanvas({
           data: {
             step,
             isSelected: selectedStepId === step.id,
+            onOpenStepConfig,
           },
         })
 
@@ -185,7 +189,7 @@ export function FlowCanvas({
     })
 
     return { nodes, edges }
-  }, [workflow.steps, selectedStepId, onAddStep])
+  }, [workflow.steps, selectedStepId, onAddStep, onOpenStepConfig])
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
@@ -200,10 +204,15 @@ export function FlowCanvas({
     onSelectStep(null)
   }, [onSelectStep])
 
-  // Handle node clicks
+  // Handle node clicks - only select if not clicking an action button
   const onNodeClick: NodeMouseHandler = useCallback((event, node) => {
     if (node.type === "stepNode") {
-      onSelectStep(node.id)
+      // Check if click originated from an action button (which handles its own click)
+      const target = event.target as HTMLElement
+      const isActionButton = target.closest('button[type="button"]')
+      if (!isActionButton) {
+        onSelectStep(node.id)
+      }
     }
   }, [onSelectStep])
 

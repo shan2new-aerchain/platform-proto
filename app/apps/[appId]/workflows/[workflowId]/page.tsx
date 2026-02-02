@@ -6,6 +6,7 @@ import { ReactFlowProvider } from "@xyflow/react"
 import { SiteHeader } from "@/components/site-header"
 import { FlowCanvas } from "@/components/workflow/flow-canvas"
 import { StepConfigSheet } from "@/components/workflow/step-config-sheet"
+import { StepSettingsDialog } from "@/components/workflow/step-settings-dialog"
 import { AddStepDialog } from "@/components/workflow/add-step-dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -17,6 +18,7 @@ import {
 } from "@hugeicons/core-free-icons"
 import { getWorkflowById, getAppById } from "@/lib/mock-data"
 import type { Step, StepType, WorkflowDefinition } from "@/lib/workflow-types"
+import type { StepConfigFocus } from "@/components/workflow/step-config-sheet"
 
 export default function WorkflowBuilderPage({
   params,
@@ -31,7 +33,10 @@ export default function WorkflowBuilderPage({
     initialWorkflow || null
   )
   const [selectedStepId, setSelectedStepId] = useState<string | null>(null)
+  const [selectedStepFocus, setSelectedStepFocus] = useState<StepConfigFocus>(null)
   const [showAddStepDialog, setShowAddStepDialog] = useState(false)
+  const [settingsStepId, setSettingsStepId] = useState<string | null>(null)
+  const [settingsFocus, setSettingsFocus] = useState<"notifications" | "visibility" | null>(null)
 
   if (!workflow || !app) {
     notFound()
@@ -39,6 +44,10 @@ export default function WorkflowBuilderPage({
 
   const selectedStep = selectedStepId
     ? workflow.steps.find((s) => s.id === selectedStepId)
+    : null
+
+  const settingsStep = settingsStepId
+    ? workflow.steps.find((s) => s.id === settingsStepId)
     : null
 
   const handleAddStep = (type: StepType) => {
@@ -62,6 +71,8 @@ export default function WorkflowBuilderPage({
         actors: {
           assignmentType: 'roles',
           roleIds: [],
+          userIds: [],
+          dynamicRules: [],
           allowReassignment: true,
         },
         completion: {
@@ -94,6 +105,15 @@ export default function WorkflowBuilderPage({
         s.id === updatedStep.id ? updatedStep : s
       ),
     })
+  }
+
+  const handleDeleteStep = (stepId: string) => {
+    setWorkflow({
+      ...workflow,
+      steps: workflow.steps.filter((s) => s.id !== stepId),
+    })
+    setSelectedStepId(null)
+    setSelectedStepFocus(null)
   }
 
   return (
@@ -138,7 +158,20 @@ export default function WorkflowBuilderPage({
           <FlowCanvas
             workflow={workflow}
             selectedStepId={selectedStepId}
-            onSelectStep={setSelectedStepId}
+            onSelectStep={(stepId) => {
+              setSelectedStepId(stepId)
+              setSelectedStepFocus(null)
+            }}
+            onOpenStepConfig={(stepId, focus) => {
+              // Route notifications/visibility to the standalone settings dialog
+              if (focus === "notifications" || focus === "visibility") {
+                setSettingsStepId(stepId)
+                setSettingsFocus(focus)
+              } else {
+                setSelectedStepId(stepId)
+                setSelectedStepFocus(focus)
+              }
+            }}
             onAddStep={() => setShowAddStepDialog(true)}
             onUpdateWorkflow={setWorkflow}
           >
@@ -146,15 +179,34 @@ export default function WorkflowBuilderPage({
               step={selectedStep}
               open={!!selectedStep}
               onOpenChange={(open) => {
-                if (!open) setSelectedStepId(null)
+                if (!open) {
+                  setSelectedStepId(null)
+                  setSelectedStepFocus(null)
+                }
               }}
               onUpdate={handleUpdateStep}
+              onDeleteStep={handleDeleteStep}
+              initialFocus={selectedStepFocus}
             />
             <AddStepDialog
               open={showAddStepDialog}
               onOpenChange={setShowAddStepDialog}
               onSelectStepType={handleAddStep}
             />
+            {settingsStep && (
+              <StepSettingsDialog
+                step={settingsStep}
+                open={!!settingsStep}
+                onOpenChange={(open) => {
+                  if (!open) {
+                    setSettingsStepId(null)
+                    setSettingsFocus(null)
+                  }
+                }}
+                onUpdate={handleUpdateStep}
+                initialFocus={settingsFocus}
+              />
+            )}
           </FlowCanvas>
         </ReactFlowProvider>
       </div>

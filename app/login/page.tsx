@@ -51,10 +51,10 @@ export default function LoginPage() {
               <Image
                 src="/logo.svg"
                 alt="Platform Logo"
-                width={32}
-                height={32}
+                width={36}
+                height={36}
               />
-              <CardTitle className="text-2xl font-semibold tracking-tight">
+              <CardTitle className="text-3xl font-semibold tracking-tight font-brand">
                 Platform
               </CardTitle>
             </div>
