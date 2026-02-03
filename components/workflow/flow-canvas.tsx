@@ -32,6 +32,7 @@ interface FlowCanvasProps {
   selectedStepId: string | null
   onSelectStep: (stepId: string | null) => void
   onOpenStepConfig?: (stepId: string, focus: StepConfigFocus) => void
+  onRequestDeleteStep?: (stepId: string) => void
   onAddStep: () => void
   onUpdateWorkflow: (workflow: WorkflowDefinition) => void
   /** Dialogs rendered here will be centered to the canvas (portaled into canvas container). */
@@ -49,6 +50,7 @@ export function FlowCanvas({
   selectedStepId,
   onSelectStep,
   onOpenStepConfig,
+  onRequestDeleteStep,
   onAddStep,
   children,
 }: FlowCanvasProps) {
@@ -144,6 +146,7 @@ export function FlowCanvas({
             step,
             isSelected: selectedStepId === step.id,
             onOpenStepConfig,
+            onRequestDelete: onRequestDeleteStep,
           },
         })
 
@@ -189,7 +192,7 @@ export function FlowCanvas({
     })
 
     return { nodes, edges }
-  }, [workflow.steps, selectedStepId, onAddStep, onOpenStepConfig])
+  }, [workflow.steps, selectedStepId, onAddStep, onOpenStepConfig, onRequestDeleteStep])
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
@@ -237,10 +240,10 @@ export function FlowCanvas({
         onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
         fitView
-        fitViewOptions={{ padding: 0.2 }}
+        fitViewOptions={{ padding: 0.2, maxZoom: 1 }}
         minZoom={0.5}
         maxZoom={1.5}
-        defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
+        defaultViewport={{ x: 0, y: 0, zoom: 1 }}
         proOptions={{ hideAttribution: true }}
         nodesDraggable={false}
         nodesConnectable={false}

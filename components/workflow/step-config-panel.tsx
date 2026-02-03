@@ -31,7 +31,6 @@ import type {
   StepType,
 } from "@/lib/workflow-types"
 import { cn } from "@/lib/utils"
-import { ActorsRuleBasedDialog } from "./actors-rule-based-dialog"
 import { RuleBuilder, defaultRuleFields } from "./rule-builder"
 
 const TAB_TRIGGER = "trigger"
@@ -222,7 +221,6 @@ export function StepConfigPanel({ step, onUpdate, initialFocus = null }: StepCon
     : stepLabelMapFallback[step.type]
 
   const [activeTab, setActiveTab] = React.useState(() => focusToTab(initialFocus))
-  const [ruleBasedDialogOpen, setRuleBasedDialogOpen] = React.useState(false)
 
   React.useEffect(() => {
     setActiveTab((prev) => (initialFocus ? focusToTab(initialFocus) : prev))
@@ -335,7 +333,6 @@ export function StepConfigPanel({ step, onUpdate, initialFocus = null }: StepCon
                 type="button"
                 onClick={() => {
                   updateActors({ assignmentType: option.value as AssignmentType })
-                  if (option.value === "dynamic") setRuleBasedDialogOpen(true)
                 }}
                 className={cn(
                   "flex flex-col items-start gap-1.5 rounded-lg border-2 p-2.5 transition-all text-left min-w-0",
@@ -398,27 +395,19 @@ export function StepConfigPanel({ step, onUpdate, initialFocus = null }: StepCon
         {step.config.actors.assignmentType === "dynamic" && (
           <div>
             <span className="text-xs font-medium text-muted-foreground">Dynamic rules</span>
-            <Button
-              variant="outline"
-              className="mt-2 w-full justify-start text-muted-foreground font-normal"
-              size="sm"
-              onClick={() => setRuleBasedDialogOpen(true)}
-            >
-              {(step.config.actors.dynamicRules?.length ?? 0) > 0
-                ? `${step.config.actors.dynamicRules?.length} rule(s)`
-                : "Select by rules"}
-            </Button>
+            <div className="mt-2">
+              <RuleBuilder
+                rules={step.config.actors.dynamicRules || []}
+                onRulesChange={(dynamicRules) => updateActors({ dynamicRules })}
+                fields={defaultRuleFields}
+                emptyState="No dynamic rules yet."
+              />
+            </div>
             {step.config.actors.dynamicRule && !(step.config.actors.dynamicRules?.length) && (
               <p className="mt-2 text-xs text-muted-foreground">
                 Legacy rule: {step.config.actors.dynamicRule}
               </p>
             )}
-            <ActorsRuleBasedDialog
-              open={ruleBasedDialogOpen}
-              onOpenChange={setRuleBasedDialogOpen}
-              step={step}
-              onUpdate={onUpdate}
-            />
           </div>
         )}
       </TabsContent>

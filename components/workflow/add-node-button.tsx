@@ -9,10 +9,13 @@ import { Button } from "@/components/ui/button"
 interface AddNodeButtonProps {
   data: {
     onAdd: () => void
+    label?: string
   }
 }
 
 export const AddNodeButton = memo(function AddNodeButton({ data }: AddNodeButtonProps) {
+  const label = data.label ?? "Add step"
+
   return (
     <>
       <Handle type="target" position={Position.Top} className="bg-transparent! border-0! w-0! h-0!" />
@@ -26,7 +29,7 @@ export const AddNodeButton = memo(function AddNodeButton({ data }: AddNodeButton
             e.stopPropagation()
             data.onAdd()
           }}
-          aria-label="Add step"
+          aria-label={label}
         >
           <HugeiconsIcon icon={Add01Icon} size={14} />
         </Button>

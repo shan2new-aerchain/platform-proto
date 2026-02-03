@@ -21,7 +21,7 @@ export const StartEndNode = memo(function StartEndNode({ data }: StartEndNodePro
       <div className="w-[200px] flex items-center justify-center">
         <div
           className={cn(
-            "flex items-center justify-center rounded-lg px-5 py-2 border min-w-[100px] text-[0.75rem] font-normal leading-none tracking-normal",
+            "flex items-center justify-center rounded-lg px-4 py-1.5 border text-[0.625rem] font-medium leading-none",
             type === "start"
               ? "bg-primary/8 text-primary/90 border-primary/20"
               : "bg-muted/80 text-muted-foreground border-border"

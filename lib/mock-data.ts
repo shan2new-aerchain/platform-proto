@@ -1,10 +1,16 @@
 import type {
   App,
   AppCategory,
+  PipelineDefinition,
+  PipelineStage,
   Role,
+  StageTransition,
+  StageWorkflowGraph,
   StepDefinition,
   User,
   WorkflowDefinition,
+  WorkflowNode,
+  WorkflowTransition,
 } from './workflow-types'
 
 // Category metadata
@@ -131,7 +137,7 @@ export const apps: App[] = [
     color: '#ea580c',
     category: 'source-to-pay',
     entityTypes: ['requisition'],
-    workflowCount: 3,
+    workflowCount: 8,
   },
   {
     id: 'intake',
@@ -141,7 +147,7 @@ export const apps: App[] = [
     color: '#f59e0b',
     category: 'source-to-pay',
     entityTypes: ['intake'],
-    workflowCount: 0,
+    workflowCount: 1,
   },
   {
     id: 'quote-request',
@@ -151,7 +157,7 @@ export const apps: App[] = [
     color: '#8b5cf6',
     category: 'source-to-pay',
     entityTypes: ['quote_request'],
-    workflowCount: 0,
+    workflowCount: 1,
   },
   {
     id: 'negotiation-request',
@@ -884,7 +890,735 @@ export const getAppsByCategory = (): Record<AppCategory, App[]> => {
 
 export const getActiveCategories = (): AppCategory[] => {
   const categories = new Set(apps.map(app => app.category))
-  return Array.from(categories).sort((a, b) => 
+  return Array.from(categories).sort((a, b) =>
     appCategoryMetadata[a].order - appCategoryMetadata[b].order
   )
+}
+
+// ============================================
+// S2P Pipeline Data
+// ============================================
+
+// S2P Pipeline Stages
+export const s2pPipelineStages: PipelineStage[] = [
+  {
+    id: 'stage-intake',
+    appId: 'intake',
+    name: 'Intake',
+    description: 'Initial request intake',
+    icon: 'InboxIcon',
+    color: '#f59e0b',
+    status: 'enabled',
+    position: { x: 100, y: 200 },
+  },
+  {
+    id: 'stage-requisition',
+    appId: 'requisition',
+    name: 'Requisition',
+    description: 'Purchase requisition',
+    icon: 'ShoppingCart01Icon',
+    color: '#ea580c',
+    status: 'enabled',
+    position: { x: 280, y: 200 },
+  },
+  {
+    id: 'stage-quote-request',
+    appId: 'quote-request',
+    name: 'Quote Request',
+    description: 'Request for quotation',
+    icon: 'FileSearchIcon',
+    color: '#8b5cf6',
+    status: 'enabled',
+    position: { x: 460, y: 200 },
+  },
+  {
+    id: 'stage-negotiation',
+    appId: 'negotiation-request',
+    name: 'Negotiation',
+    description: 'Supplier negotiation',
+    icon: 'MessageMultiple02Icon',
+    color: '#6366f1',
+    status: 'disabled',
+    position: { x: 640, y: 200 },
+  },
+  {
+    id: 'stage-purchase-order',
+    appId: 'purchase-order',
+    name: 'Purchase Order',
+    description: 'PO creation',
+    icon: 'ShoppingBasket01Icon',
+    color: '#14b8a6',
+    status: 'disabled',
+    position: { x: 820, y: 200 },
+  },
+  {
+    id: 'stage-grn',
+    appId: 'grn',
+    name: 'GRN',
+    description: 'Goods receipt',
+    icon: 'PackageIcon',
+    color: '#10b981',
+    status: 'disabled',
+    position: { x: 1000, y: 200 },
+  },
+  {
+    id: 'stage-qc',
+    appId: 'qc',
+    name: 'QC',
+    description: 'Quality control',
+    icon: 'CheckmarkBadge01Icon',
+    color: '#059669',
+    status: 'disabled',
+    position: { x: 1180, y: 200 },
+  },
+  {
+    id: 'stage-invoice',
+    appId: 'invoice',
+    name: 'Invoice',
+    description: 'Invoice processing',
+    icon: 'Invoice01Icon',
+    color: '#16a34a',
+    status: 'enabled',
+    position: { x: 1360, y: 200 },
+  },
+  {
+    id: 'stage-payment',
+    appId: 'payment',
+    name: 'Payment',
+    description: 'Payment processing',
+    icon: 'Wallet02Icon',
+    color: '#84cc16',
+    status: 'disabled',
+    position: { x: 1540, y: 200 },
+  },
+]
+
+// S2P Pipeline Transitions (linear flow for now)
+export const s2pPipelineTransitions: StageTransition[] = [
+  { id: 'tr-start-intake', fromStageId: 'start', toStageId: 'stage-intake' },
+  { id: 'tr-intake-req', fromStageId: 'stage-intake', toStageId: 'stage-requisition' },
+  { id: 'tr-req-quote', fromStageId: 'stage-requisition', toStageId: 'stage-quote-request' },
+  { id: 'tr-quote-neg', fromStageId: 'stage-quote-request', toStageId: 'stage-negotiation' },
+  { id: 'tr-neg-po', fromStageId: 'stage-negotiation', toStageId: 'stage-purchase-order' },
+  { id: 'tr-po-grn', fromStageId: 'stage-purchase-order', toStageId: 'stage-grn' },
+  { id: 'tr-grn-qc', fromStageId: 'stage-grn', toStageId: 'stage-qc' },
+  { id: 'tr-qc-inv', fromStageId: 'stage-qc', toStageId: 'stage-invoice' },
+  { id: 'tr-inv-pay', fromStageId: 'stage-invoice', toStageId: 'stage-payment' },
+  { id: 'tr-pay-end', fromStageId: 'stage-payment', toStageId: 'end' },
+]
+
+// S2P Pipeline Definition
+export const s2pPipeline: PipelineDefinition = {
+  id: 's2p-pipeline',
+  name: 'Source-to-Pay Pipeline',
+  description: 'End-to-end procurement workflow from intake to payment',
+  stages: s2pPipelineStages,
+  transitions: s2pPipelineTransitions,
+}
+
+// ============================================
+// Stage Workflow Graphs (workflows within each stage)
+// ============================================
+
+// Intake stage workflows
+export const intakeStageWorkflowGraph: StageWorkflowGraph = {
+  stageId: 'stage-intake',
+  workflows: [
+    { workflowId: 'intake-approval-wf', position: { x: 300, y: 150 } },
+  ],
+  transitions: [
+    { id: 'wt-1', fromWorkflowId: 'stage_start', toWorkflowId: 'intake-approval-wf', relationType: 'sequential' },
+    { id: 'wt-2', fromWorkflowId: 'intake-approval-wf', toWorkflowId: 'stage_end', relationType: 'sequential' },
+  ],
+}
+
+// Requisition stage workflows - organized by lifecycle operation
+export const requisitionStageWorkflowGraph: StageWorkflowGraph = {
+  stageId: 'stage-requisition',
+  workflows: [
+    { workflowId: 'req-approval-wf', position: { x: 300, y: 150 } },
+    { workflowId: 'req-purchaser-assignment-wf', position: { x: 300, y: 340 } },
+    { workflowId: 'req-amend-wf', position: { x: 300, y: 150 } },
+    { workflowId: 'req-partial-fulfillment-wf', position: { x: 300, y: 340 } },
+    { workflowId: 'req-cancel-wf', position: { x: 300, y: 150 } },
+  ],
+  transitions: [
+    // Create flow: Approval -> Purchaser Assignment -> End
+    { id: 'wt-1', fromWorkflowId: 'stage_start', toWorkflowId: 'req-approval-wf', relationType: 'sequential' },
+    { id: 'wt-2', fromWorkflowId: 'req-approval-wf', toWorkflowId: 'req-purchaser-assignment-wf', relationType: 'sequential' },
+    { id: 'wt-3', fromWorkflowId: 'req-purchaser-assignment-wf', toWorkflowId: 'stage_end', relationType: 'sequential' },
+    // Amend flow: Amend -> Partial Fulfillment -> End
+    { id: 'wt-4', fromWorkflowId: 'stage_start', toWorkflowId: 'req-amend-wf', relationType: 'sequential' },
+    { id: 'wt-5', fromWorkflowId: 'req-amend-wf', toWorkflowId: 'req-partial-fulfillment-wf', relationType: 'sequential' },
+    { id: 'wt-6', fromWorkflowId: 'req-partial-fulfillment-wf', toWorkflowId: 'stage_end', relationType: 'sequential' },
+    // Cancel flow: Cancel -> End
+    { id: 'wt-7', fromWorkflowId: 'stage_start', toWorkflowId: 'req-cancel-wf', relationType: 'sequential' },
+    { id: 'wt-8', fromWorkflowId: 'req-cancel-wf', toWorkflowId: 'stage_end', relationType: 'sequential' },
+  ],
+}
+
+// Quote Request stage workflows
+export const quoteRequestStageWorkflowGraph: StageWorkflowGraph = {
+  stageId: 'stage-quote-request',
+  workflows: [
+    { workflowId: 'quote-request-wf', position: { x: 300, y: 150 } },
+  ],
+  transitions: [
+    { id: 'wt-1', fromWorkflowId: 'stage_start', toWorkflowId: 'quote-request-wf', relationType: 'sequential' },
+    { id: 'wt-2', fromWorkflowId: 'quote-request-wf', toWorkflowId: 'stage_end', relationType: 'sequential' },
+  ],
+}
+
+// Invoice stage workflows (example with parallel workflows)
+export const invoiceStageWorkflowGraph: StageWorkflowGraph = {
+  stageId: 'stage-invoice',
+  workflows: [
+    { workflowId: 'inv-create-wf', position: { x: 200, y: 150 } },
+    { workflowId: 'inv-cancel-wf', position: { x: 500, y: 150 } },
+  ],
+  transitions: [
+    { id: 'wt-1', fromWorkflowId: 'stage_start', toWorkflowId: 'inv-create-wf', relationType: 'parallel' },
+    { id: 'wt-2', fromWorkflowId: 'stage_start', toWorkflowId: 'inv-cancel-wf', relationType: 'parallel' },
+    { id: 'wt-3', fromWorkflowId: 'inv-create-wf', toWorkflowId: 'stage_end', relationType: 'sequential' },
+    { id: 'wt-4', fromWorkflowId: 'inv-cancel-wf', toWorkflowId: 'stage_end', relationType: 'sequential' },
+  ],
+}
+
+// Map of all stage workflow graphs
+export const stageWorkflowGraphs: Record<string, StageWorkflowGraph> = {
+  'stage-intake': intakeStageWorkflowGraph,
+  'stage-requisition': requisitionStageWorkflowGraph,
+  'stage-quote-request': quoteRequestStageWorkflowGraph,
+  'stage-invoice': invoiceStageWorkflowGraph,
+}
+
+// Additional workflows for S2P stages
+export const intakeApprovalWorkflow: WorkflowDefinition = {
+  id: 'intake-approval-wf',
+  name: 'Intake Approval Workflow',
+  description: 'Standard approval workflow for intake requests',
+  version: 'v1.0',
+  appId: 'intake',
+  entityType: 'intake',
+  operation: 'create',
+  status: 'published',
+  createdAt: '2025-01-15T10:00:00Z',
+  updatedAt: '2025-01-20T14:30:00Z',
+  steps: [
+    {
+      id: 'step-1',
+      definitionId: 'approval',
+      name: 'Initial Review',
+      type: 'approval',
+      position: { x: 400, y: 150 },
+      config: {
+        actors: {
+          assignmentType: 'roles',
+          roleIds: ['l1_approver'],
+          allowReassignment: true,
+        },
+        completion: { criteria: 'any', enableTimeout: true, timeoutHours: 24 },
+        conditions: { appliesTo: ['create'], rules: [] },
+        notifications: {
+          onEntry: { notifyActors: true, notifyRequester: false },
+          onCompletion: { notifyRequester: true, notifyNextActors: true },
+        },
+        visibility: { type: 'all_participants' },
+      },
+    },
+  ],
+  transitions: [
+    { id: 'tr-1', fromStepId: 'start', toStepId: 'step-1' },
+    { id: 'tr-2', fromStepId: 'step-1', toStepId: 'end', action: 'approve' },
+    { id: 'tr-3', fromStepId: 'step-1', toStepId: 'end', action: 'reject' },
+  ],
+}
+
+export const quoteRequestWorkflow: WorkflowDefinition = {
+  id: 'quote-request-wf',
+  name: 'Quote Request Workflow',
+  description: 'Workflow for processing quote requests',
+  version: 'v1.0',
+  appId: 'quote-request',
+  entityType: 'quote_request',
+  operation: 'create',
+  status: 'published',
+  createdAt: '2025-01-15T10:00:00Z',
+  updatedAt: '2025-01-20T14:30:00Z',
+  steps: [
+    {
+      id: 'step-1',
+      definitionId: 'review',
+      name: 'Quote Review',
+      type: 'review',
+      position: { x: 400, y: 150 },
+      config: {
+        actors: {
+          assignmentType: 'roles',
+          roleIds: ['purchaser'],
+          allowReassignment: true,
+        },
+        completion: { criteria: 'any', enableTimeout: false },
+        conditions: { appliesTo: ['create'], rules: [] },
+        notifications: {
+          onEntry: { notifyActors: true, notifyRequester: false },
+          onCompletion: { notifyRequester: true, notifyNextActors: true },
+        },
+        visibility: { type: 'all_participants' },
+      },
+    },
+    {
+      id: 'step-2',
+      definitionId: 'approval',
+      name: 'Sourcing Approval',
+      type: 'approval',
+      position: { x: 400, y: 300 },
+      config: {
+        actors: {
+          assignmentType: 'roles',
+          roleIds: ['l2_approver'],
+          allowReassignment: true,
+        },
+        completion: { criteria: 'any', enableTimeout: true, timeoutHours: 48 },
+        conditions: { appliesTo: ['create'], rules: [] },
+        notifications: {
+          onEntry: { notifyActors: true, notifyRequester: false },
+          onCompletion: { notifyRequester: true, notifyNextActors: false },
+        },
+        visibility: { type: 'all_participants' },
+      },
+    },
+  ],
+  transitions: [
+    { id: 'tr-1', fromStepId: 'start', toStepId: 'step-1' },
+    { id: 'tr-2', fromStepId: 'step-1', toStepId: 'step-2', action: 'submit_review' },
+    { id: 'tr-3', fromStepId: 'step-2', toStepId: 'end', action: 'approve' },
+    { id: 'tr-4', fromStepId: 'step-2', toStepId: 'end', action: 'reject' },
+  ],
+}
+
+// Requisition Approval Workflow - Multi-level approval based on amount
+export const requisitionApprovalWorkflow: WorkflowDefinition = {
+  id: 'req-approval-wf',
+  name: 'Approval Workflow',
+  description: 'Multi-level approval workflow for requisitions based on value thresholds',
+  version: 'v1.0',
+  appId: 'requisition',
+  entityType: 'requisition',
+  operation: 'create',
+  status: 'published',
+  createdAt: '2025-01-15T10:00:00Z',
+  updatedAt: '2025-01-20T14:30:00Z',
+  steps: [
+    {
+      id: 'step-1',
+      definitionId: 'approval',
+      name: 'Manager Approval',
+      type: 'approval',
+      position: { x: 400, y: 150 },
+      config: {
+        actors: {
+          assignmentType: 'roles',
+          roleIds: ['l1_approver'],
+          allowReassignment: true,
+          reassignmentType: 'roles',
+          reassignmentRoleIds: ['l1_approver', 'l2_approver'],
+        },
+        completion: { criteria: 'any', enableTimeout: true, timeoutHours: 24 },
+        conditions: { appliesTo: ['create'], rules: [] },
+        notifications: {
+          onEntry: { notifyActors: true, notifyRequester: false },
+          onCompletion: { notifyRequester: true, notifyNextActors: true },
+        },
+        visibility: { type: 'all_participants' },
+      },
+    },
+    {
+      id: 'step-2',
+      definitionId: 'approval',
+      name: 'Finance Review',
+      type: 'approval',
+      position: { x: 400, y: 270 },
+      config: {
+        actors: {
+          assignmentType: 'roles',
+          roleIds: ['finance_manager'],
+          allowReassignment: true,
+        },
+        completion: { criteria: 'any', enableTimeout: true, timeoutHours: 48 },
+        conditions: {
+          appliesTo: ['create'],
+          rules: [
+            { id: 'rule-1', field: 'amount', operator: 'greater_than', value: 5000 },
+          ],
+        },
+        notifications: {
+          onEntry: { notifyActors: true, notifyRequester: false },
+          onCompletion: { notifyRequester: true, notifyNextActors: true },
+        },
+        visibility: { type: 'all_participants' },
+      },
+    },
+    {
+      id: 'step-3',
+      definitionId: 'approval',
+      name: 'Director Approval',
+      type: 'approval',
+      position: { x: 400, y: 390 },
+      config: {
+        actors: {
+          assignmentType: 'roles',
+          roleIds: ['l2_approver'],
+          allowReassignment: false,
+        },
+        completion: { criteria: 'any', enableTimeout: true, timeoutHours: 72 },
+        conditions: {
+          appliesTo: ['create'],
+          rules: [
+            { id: 'rule-1', field: 'amount', operator: 'greater_than', value: 25000 },
+          ],
+        },
+        notifications: {
+          onEntry: { notifyActors: true, notifyRequester: false },
+          onCompletion: { notifyRequester: true, notifyNextActors: false },
+        },
+        visibility: { type: 'all_participants' },
+      },
+    },
+  ],
+  transitions: [
+    { id: 'tr-1', fromStepId: 'start', toStepId: 'step-1' },
+    { id: 'tr-2', fromStepId: 'step-1', toStepId: 'step-2', action: 'approve' },
+    { id: 'tr-3', fromStepId: 'step-1', toStepId: 'end', action: 'reject' },
+    { id: 'tr-4', fromStepId: 'step-2', toStepId: 'step-3', action: 'approve' },
+    { id: 'tr-5', fromStepId: 'step-2', toStepId: 'end', action: 'reject' },
+    { id: 'tr-6', fromStepId: 'step-3', toStepId: 'end', action: 'approve' },
+    { id: 'tr-7', fromStepId: 'step-3', toStepId: 'end', action: 'reject' },
+  ],
+}
+
+// Requisition Purchaser Assignment Workflow - Assigns purchaser based on category
+export const requisitionPurchaserAssignmentWorkflow: WorkflowDefinition = {
+  id: 'req-purchaser-assignment-wf',
+  name: 'Purchaser Assignment Workflow',
+  description: 'Assigns a purchaser to handle the requisition based on category and workload',
+  version: 'v1.0',
+  appId: 'requisition',
+  entityType: 'requisition',
+  operation: 'create',
+  status: 'published',
+  createdAt: '2025-01-15T10:00:00Z',
+  updatedAt: '2025-01-20T14:30:00Z',
+  steps: [
+    {
+      id: 'step-1',
+      definitionId: 'assignment',
+      name: 'Category-Based Assignment',
+      type: 'assignment',
+      position: { x: 400, y: 150 },
+      config: {
+        actors: {
+          assignmentType: 'dynamic',
+          dynamicRule: 'purchaser-pool-by-category',
+          dynamicRules: [
+            { id: 'rule-1', field: 'category', operator: 'equals', value: 'IT' },
+          ],
+          allowReassignment: true,
+          reassignmentType: 'roles',
+          reassignmentRoleIds: ['purchaser'],
+        },
+        completion: { criteria: 'any', enableTimeout: true, timeoutHours: 8 },
+        conditions: { appliesTo: ['create'], rules: [] },
+        notifications: {
+          onEntry: { notifyActors: true, notifyRequester: true },
+          onCompletion: { notifyRequester: true, notifyNextActors: true },
+        },
+        visibility: { type: 'all_participants' },
+      },
+    },
+    {
+      id: 'step-2',
+      definitionId: 'acknowledgement',
+      name: 'Purchaser Acknowledgement',
+      type: 'acknowledgement',
+      position: { x: 400, y: 270 },
+      config: {
+        actors: {
+          assignmentType: 'roles',
+          roleIds: ['purchaser'],
+          allowReassignment: false,
+        },
+        completion: { criteria: 'any', enableTimeout: true, timeoutHours: 4 },
+        conditions: { appliesTo: ['create'], rules: [] },
+        notifications: {
+          onEntry: { notifyActors: true, notifyRequester: false },
+          onCompletion: { notifyRequester: true, notifyNextActors: false },
+        },
+        visibility: { type: 'all_participants' },
+      },
+    },
+  ],
+  transitions: [
+    { id: 'tr-1', fromStepId: 'start', toStepId: 'step-1' },
+    { id: 'tr-2', fromStepId: 'step-1', toStepId: 'step-2', action: 'claim' },
+    { id: 'tr-3', fromStepId: 'step-2', toStepId: 'end', action: 'acknowledge' },
+  ],
+}
+
+// Requisition Amend Workflow - For changes to existing requisitions
+export const requisitionAmendWorkflow: WorkflowDefinition = {
+  id: 'req-amend-wf',
+  name: 'Amend Workflow',
+  description: 'Approval workflow for requisition amendments and changes',
+  version: 'v1.0',
+  appId: 'requisition',
+  entityType: 'requisition',
+  operation: 'amend',
+  status: 'published',
+  createdAt: '2025-01-16T10:00:00Z',
+  updatedAt: '2025-01-21T14:30:00Z',
+  steps: [
+    {
+      id: 'step-1',
+      definitionId: 'review',
+      name: 'Change Impact Review',
+      type: 'review',
+      position: { x: 400, y: 150 },
+      config: {
+        actors: {
+          assignmentType: 'roles',
+          roleIds: ['purchaser'],
+          allowReassignment: true,
+        },
+        completion: { criteria: 'any', enableTimeout: true, timeoutHours: 24 },
+        conditions: { appliesTo: ['amend'], rules: [] },
+        notifications: {
+          onEntry: { notifyActors: true, notifyRequester: false },
+          onCompletion: { notifyRequester: true, notifyNextActors: true },
+        },
+        visibility: { type: 'all_participants' },
+      },
+    },
+    {
+      id: 'step-2',
+      definitionId: 'approval',
+      name: 'Amendment Approval',
+      type: 'approval',
+      position: { x: 400, y: 270 },
+      config: {
+        actors: {
+          assignmentType: 'roles',
+          roleIds: ['l1_approver'],
+          allowReassignment: true,
+        },
+        completion: { criteria: 'any', enableTimeout: true, timeoutHours: 48 },
+        conditions: { appliesTo: ['amend'], rules: [] },
+        notifications: {
+          onEntry: { notifyActors: true, notifyRequester: false },
+          onCompletion: { notifyRequester: true, notifyNextActors: false },
+        },
+        visibility: { type: 'all_participants' },
+      },
+    },
+  ],
+  transitions: [
+    { id: 'tr-1', fromStepId: 'start', toStepId: 'step-1' },
+    { id: 'tr-2', fromStepId: 'step-1', toStepId: 'step-2', action: 'submit_review' },
+    { id: 'tr-3', fromStepId: 'step-2', toStepId: 'end', action: 'approve' },
+    { id: 'tr-4', fromStepId: 'step-2', toStepId: 'end', action: 'reject' },
+  ],
+}
+
+// Requisition Partial Fulfillment Workflow - When not all items can be fulfilled
+export const requisitionPartialFulfillmentWorkflow: WorkflowDefinition = {
+  id: 'req-partial-fulfillment-wf',
+  name: 'Partial Fulfillment Workflow',
+  description: 'Handles cases where only some items can be fulfilled (e.g., requested 10, received 7)',
+  version: 'v1.0',
+  appId: 'requisition',
+  entityType: 'requisition',
+  operation: 'amend',
+  status: 'published',
+  createdAt: '2025-01-17T10:00:00Z',
+  updatedAt: '2025-01-22T14:30:00Z',
+  steps: [
+    {
+      id: 'step-1',
+      definitionId: 'review',
+      name: 'Fulfillment Gap Review',
+      type: 'review',
+      position: { x: 400, y: 150 },
+      config: {
+        actors: {
+          assignmentType: 'roles',
+          roleIds: ['purchaser'],
+          allowReassignment: true,
+        },
+        completion: { criteria: 'any', enableTimeout: true, timeoutHours: 24 },
+        conditions: { appliesTo: ['amend'], rules: [] },
+        notifications: {
+          onEntry: { notifyActors: true, notifyRequester: true },
+          onCompletion: { notifyRequester: true, notifyNextActors: true },
+        },
+        visibility: { type: 'all_participants' },
+      },
+    },
+    {
+      id: 'step-2',
+      definitionId: 'acknowledgement',
+      name: 'Requester Acknowledgement',
+      type: 'acknowledgement',
+      position: { x: 400, y: 270 },
+      config: {
+        actors: {
+          assignmentType: 'roles',
+          roleIds: ['requester'],
+          allowReassignment: false,
+        },
+        completion: { criteria: 'any', enableTimeout: true, timeoutHours: 48 },
+        conditions: { appliesTo: ['amend'], rules: [] },
+        notifications: {
+          onEntry: { notifyActors: true, notifyRequester: false },
+          onCompletion: { notifyRequester: false, notifyNextActors: true },
+        },
+        visibility: { type: 'all_participants' },
+      },
+    },
+    {
+      id: 'step-3',
+      definitionId: 'approval',
+      name: 'Manager Sign-off',
+      type: 'approval',
+      position: { x: 400, y: 390 },
+      config: {
+        actors: {
+          assignmentType: 'roles',
+          roleIds: ['l1_approver'],
+          allowReassignment: true,
+        },
+        completion: { criteria: 'any', enableTimeout: true, timeoutHours: 24 },
+        conditions: {
+          appliesTo: ['amend'],
+          rules: [
+            { id: 'rule-1', field: 'fulfillment_gap_percent', operator: 'greater_than', value: 20 },
+          ],
+        },
+        notifications: {
+          onEntry: { notifyActors: true, notifyRequester: false },
+          onCompletion: { notifyRequester: true, notifyNextActors: false },
+        },
+        visibility: { type: 'all_participants' },
+      },
+    },
+  ],
+  transitions: [
+    { id: 'tr-1', fromStepId: 'start', toStepId: 'step-1' },
+    { id: 'tr-2', fromStepId: 'step-1', toStepId: 'step-2', action: 'submit_review' },
+    { id: 'tr-3', fromStepId: 'step-2', toStepId: 'step-3', action: 'acknowledge' },
+    { id: 'tr-4', fromStepId: 'step-3', toStepId: 'end', action: 'approve' },
+    { id: 'tr-5', fromStepId: 'step-3', toStepId: 'end', action: 'reject' },
+  ],
+}
+
+// Requisition Cancel Workflow - For cancelling requisitions
+export const requisitionCancelWorkflow: WorkflowDefinition = {
+  id: 'req-cancel-wf',
+  name: 'Cancel Workflow',
+  description: 'Approval workflow for requisition cancellation',
+  version: 'v1.0',
+  appId: 'requisition',
+  entityType: 'requisition',
+  operation: 'cancel',
+  status: 'published',
+  createdAt: '2025-01-17T10:00:00Z',
+  updatedAt: '2025-01-22T14:30:00Z',
+  steps: [
+    {
+      id: 'step-1',
+      definitionId: 'acknowledgement',
+      name: 'Purchaser Acknowledgement',
+      type: 'acknowledgement',
+      position: { x: 400, y: 150 },
+      config: {
+        actors: {
+          assignmentType: 'roles',
+          roleIds: ['purchaser'],
+          allowReassignment: false,
+        },
+        completion: { criteria: 'any', enableTimeout: true, timeoutHours: 24 },
+        conditions: { appliesTo: ['cancel'], rules: [] },
+        notifications: {
+          onEntry: { notifyActors: true, notifyRequester: false },
+          onCompletion: { notifyRequester: true, notifyNextActors: true },
+        },
+        visibility: { type: 'all_participants' },
+      },
+    },
+    {
+      id: 'step-2',
+      definitionId: 'approval',
+      name: 'Cancellation Approval',
+      type: 'approval',
+      position: { x: 400, y: 270 },
+      config: {
+        actors: {
+          assignmentType: 'roles',
+          roleIds: ['l1_approver'],
+          allowReassignment: true,
+        },
+        completion: { criteria: 'any', enableTimeout: true, timeoutHours: 48 },
+        conditions: { appliesTo: ['cancel'], rules: [] },
+        notifications: {
+          onEntry: { notifyActors: true, notifyRequester: false },
+          onCompletion: { notifyRequester: true, notifyNextActors: false },
+        },
+        visibility: { type: 'all_participants' },
+      },
+    },
+  ],
+  transitions: [
+    { id: 'tr-1', fromStepId: 'start', toStepId: 'step-1' },
+    { id: 'tr-2', fromStepId: 'step-1', toStepId: 'step-2', action: 'acknowledge' },
+    { id: 'tr-3', fromStepId: 'step-2', toStepId: 'end', action: 'approve' },
+    { id: 'tr-4', fromStepId: 'step-2', toStepId: 'end', action: 'reject' },
+  ],
+}
+
+// Add the new workflows to workflowDefinitions - use spread to extend
+export const allWorkflowDefinitions: WorkflowDefinition[] = [
+  ...workflowDefinitions,
+  intakeApprovalWorkflow,
+  quoteRequestWorkflow,
+  requisitionApprovalWorkflow,
+  requisitionPurchaserAssignmentWorkflow,
+  requisitionAmendWorkflow,
+  requisitionPartialFulfillmentWorkflow,
+  requisitionCancelWorkflow,
+]
+
+// Helper functions for S2P Pipeline
+export const getPipelineById = (pipelineId: string): PipelineDefinition | undefined => {
+  if (pipelineId === 's2p-pipeline') return s2pPipeline
+  return undefined
+}
+
+export const getStageById = (stageId: string): PipelineStage | undefined => {
+  return s2pPipelineStages.find((stage) => stage.id === stageId)
+}
+
+export const getStageWorkflowGraph = (stageId: string): StageWorkflowGraph | undefined => {
+  return stageWorkflowGraphs[stageId]
+}
+
+export const getWorkflowsForStage = (stageId: string): WorkflowDefinition[] => {
+  const graph = stageWorkflowGraphs[stageId]
+  if (!graph) return []
+
+  return graph.workflows
+    .map((node) => allWorkflowDefinitions.find((wf) => wf.id === node.workflowId))
+    .filter((wf): wf is WorkflowDefinition => wf !== undefined)
+}
+
+export const getEnabledStages = (): PipelineStage[] => {
+  return s2pPipelineStages.filter((stage) => stage.status === 'enabled')
 }

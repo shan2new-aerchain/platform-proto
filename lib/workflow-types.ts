@@ -153,3 +153,66 @@ export interface Role {
   name: string
   description: string
 }
+
+// ============================================
+// S2P Pipeline Types
+// ============================================
+
+// Pipeline Stage status
+export type StageStatus = 'enabled' | 'disabled' | 'coming_soon'
+
+// Pipeline Stage - represents a major stage in the S2P pipeline
+export interface PipelineStage {
+  id: string
+  appId: string  // Links to existing App
+  name: string
+  description: string
+  icon: string
+  color: string
+  status: StageStatus
+  position: { x: number; y: number }
+}
+
+// Stage Transition - how stages connect in the pipeline
+export interface StageTransition {
+  id: string
+  fromStageId: string | 'start'
+  toStageId: string | 'end'
+}
+
+// Pipeline Definition - the complete S2P pipeline
+export interface PipelineDefinition {
+  id: string
+  name: string
+  description: string
+  stages: PipelineStage[]
+  transitions: StageTransition[]
+}
+
+// ============================================
+// Stage-Level Workflow Graph Types
+// ============================================
+
+// Workflow relationship type within a stage
+export type WorkflowRelationType = 'sequential' | 'parallel'
+
+// Workflow node position within a stage
+export interface WorkflowNode {
+  workflowId: string
+  position: { x: number; y: number }
+}
+
+// Workflow transition within a stage
+export interface WorkflowTransition {
+  id: string
+  fromWorkflowId: string | 'stage_start'
+  toWorkflowId: string | 'stage_end'
+  relationType: WorkflowRelationType
+}
+
+// Stage workflow graph - defines workflow arrangement within a stage
+export interface StageWorkflowGraph {
+  stageId: string
+  workflows: WorkflowNode[]
+  transitions: WorkflowTransition[]
+}

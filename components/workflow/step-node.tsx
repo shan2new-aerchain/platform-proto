@@ -11,6 +11,9 @@ import {
   UserGroupIcon,
   Notification02Icon,
   ViewOffSlashIcon,
+  FlashIcon,
+  TimeQuarterPassIcon,
+  Delete02Icon,
 } from "@hugeicons/core-free-icons"
 import type { Step, StepType } from "@/lib/workflow-types"
 import { getStepDefinitionById, roles, users } from "@/lib/mock-data"
@@ -35,11 +38,12 @@ interface StepNodeProps {
     step: Step
     isSelected: boolean
     onOpenStepConfig?: (stepId: string, focus: import("./step-config-sheet").StepConfigFocus) => void
+    onRequestDelete?: (stepId: string) => void
   }
 }
 
 export const StepNode = memo(function StepNode({ data }: StepNodeProps) {
-  const { step, isSelected, onOpenStepConfig } = data
+  const { step, isSelected, onOpenStepConfig, onRequestDelete } = data
   const Icon = stepIconMap[step.type]
   const colors = stepColorMap[step.type]
 
@@ -70,6 +74,11 @@ export const StepNode = memo(function StepNode({ data }: StepNodeProps) {
     step.config.notifications.onCompletion.notifyRequester ||
     step.config.notifications.onCompletion.notifyNextActors
   const hasVisibility = step.config.visibility.type === 'specific_roles'
+  const hasTrigger =
+    step.config.conditions.rules.length > 0 ||
+    step.config.conditions.appliesTo.length !== 3
+  const hasCompletion =
+    step.config.completion.criteria === "all" || step.config.completion.enableTimeout
   const definition = getStepDefinitionById(step.definitionId)
   const actorsLabel = definition?.actorsLabel ?? "Assignees"
 
@@ -86,11 +95,26 @@ export const StepNode = memo(function StepNode({ data }: StepNodeProps) {
       >
         {/* Header */}
         <div className="p-2.5 space-y-0.5">
-          <div className="flex items-center gap-2">
-            <div className={cn("flex size-5 shrink-0 items-center justify-center rounded", colors.bg)}>
-              <HugeiconsIcon icon={Icon} size={11} className={colors.icon} />
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className={cn("flex size-5 shrink-0 items-center justify-center rounded", colors.bg)}>
+                <HugeiconsIcon icon={Icon} size={11} className={colors.icon} />
+              </div>
+              <h3 className="text-[11px] font-medium leading-tight truncate">{step.name}</h3>
             </div>
-            <h3 className="text-[11px] font-medium leading-tight truncate">{step.name}</h3>
+            {onRequestDelete && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onRequestDelete(step.id)
+                }}
+                className="rounded p-1 text-muted-foreground/70 hover:text-destructive"
+              >
+                <HugeiconsIcon icon={Delete02Icon} size={12} />
+                <span className="sr-only">Delete step</span>
+              </button>
+            )}
           </div>
           <div className="flex items-center gap-1 text-[9px] text-muted-foreground pl-7">
             <HugeiconsIcon icon={UserGroupIcon} size={9} />
@@ -99,7 +123,21 @@ export const StepNode = memo(function StepNode({ data }: StepNodeProps) {
         </div>
 
         {/* Action Bar - Compact */}
-        <div className="flex items-center justify-around border-t border-border bg-muted/50 px-1 py-1">
+        <div className="grid grid-cols-5 border-t border-border bg-muted/50 px-1 py-1">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onOpenStepConfig?.(step.id, "conditions")
+            }}
+            className={cn(
+              "flex flex-col items-center gap-0.5 px-1 py-0.5 rounded",
+              hasTrigger ? "text-primary" : "text-muted-foreground/60"
+            )}
+          >
+            <HugeiconsIcon icon={FlashIcon} size={11} />
+            <span className="text-[8px]">Trigger</span>
+          </button>
           <button
             type="button"
             onClick={(e) => {
@@ -107,7 +145,7 @@ export const StepNode = memo(function StepNode({ data }: StepNodeProps) {
               onOpenStepConfig?.(step.id, "actors")
             }}
             className={cn(
-              "flex flex-col items-center gap-0.5 px-1.5 py-0.5 rounded",
+              "flex flex-col items-center gap-0.5 px-1 py-0.5 rounded",
               hasAssignment ? "text-primary" : "text-muted-foreground/60"
             )}
           >
@@ -121,7 +159,7 @@ export const StepNode = memo(function StepNode({ data }: StepNodeProps) {
               onOpenStepConfig?.(step.id, "notifications")
             }}
             className={cn(
-              "flex flex-col items-center gap-0.5 px-1.5 py-0.5 rounded",
+              "flex flex-col items-center gap-0.5 px-1 py-0.5 rounded",
               hasNotifications ? "text-primary" : "text-muted-foreground/60"
             )}
           >
@@ -132,10 +170,24 @@ export const StepNode = memo(function StepNode({ data }: StepNodeProps) {
             type="button"
             onClick={(e) => {
               e.stopPropagation()
+              onOpenStepConfig?.(step.id, "completion")
+            }}
+            className={cn(
+              "flex flex-col items-center gap-0.5 px-1 py-0.5 rounded",
+              hasCompletion ? "text-primary" : "text-muted-foreground/60"
+            )}
+          >
+            <HugeiconsIcon icon={TimeQuarterPassIcon} size={11} />
+            <span className="text-[8px]">Complete</span>
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
               onOpenStepConfig?.(step.id, "visibility")
             }}
             className={cn(
-              "flex flex-col items-center gap-0.5 px-1.5 py-0.5 rounded",
+              "flex flex-col items-center gap-0.5 px-1 py-0.5 rounded",
               hasVisibility ? "text-primary" : "text-muted-foreground/60"
             )}
           >

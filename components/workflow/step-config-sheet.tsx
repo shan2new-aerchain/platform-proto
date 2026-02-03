@@ -124,7 +124,7 @@ export function StepConfigSheet({
               step={step}
               onUpdate={onUpdate}
               initialFocus={
-                initialFocus === "actors" || initialFocus === "completion"
+                initialFocus === "actors" || initialFocus === "completion" || initialFocus === "conditions"
                   ? initialFocus
                   : null
               }

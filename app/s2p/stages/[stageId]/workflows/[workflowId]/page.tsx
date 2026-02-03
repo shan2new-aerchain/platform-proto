@@ -17,23 +17,28 @@ import { TestDialog } from "@/components/workflow/test-dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { 
-  FloppyDiskIcon, 
-  PlayIcon, 
+import {
+  FloppyDiskIcon,
+  PlayIcon,
   TimeQuarterPassIcon,
 } from "@hugeicons/core-free-icons"
-import { getWorkflowById, getAppById } from "@/lib/mock-data"
+import {
+  getStageById,
+  getWorkflowsForStage,
+  allWorkflowDefinitions,
+} from "@/lib/mock-data"
 import type { Step, StepType, WorkflowDefinition } from "@/lib/workflow-types"
 import type { StepConfigFocus } from "@/components/workflow/step-config-sheet"
 
-export default function WorkflowBuilderPage({
+export default function S2PWorkflowBuilderPage({
   params,
 }: {
-  params: Promise<{ appId: string; workflowId: string }>
+  params: Promise<{ stageId: string; workflowId: string }>
 }) {
-  const { appId, workflowId } = use(params)
-  const initialWorkflow = getWorkflowById(workflowId)
-  const app = getAppById(appId)
+  const { stageId, workflowId } = use(params)
+
+  const stage = getStageById(stageId)
+  const initialWorkflow = allWorkflowDefinitions.find((w) => w.id === workflowId)
 
   const [workflow, setWorkflow] = useState<WorkflowDefinition | null>(
     initialWorkflow || null
@@ -53,7 +58,7 @@ export default function WorkflowBuilderPage({
   const [showHistoryDialog, setShowHistoryDialog] = useState(false)
   const [showTestDialog, setShowTestDialog] = useState(false)
 
-  if (!workflow || !app) {
+  if (!workflow || !stage) {
     notFound()
   }
 
@@ -83,10 +88,10 @@ export default function WorkflowBuilderPage({
 
   const handleAddStep = (type: StepType) => {
     const stepNames: Record<StepType, string> = {
-      approval: 'New approve step',
-      acknowledgement: 'New acknowledge step',
-      review: 'New review step',
-      assignment: 'New assignment step',
+      approval: "New approve step",
+      acknowledgement: "New acknowledge step",
+      review: "New review step",
+      assignment: "New assignment step",
     }
 
     const newStep: Step = {
@@ -100,25 +105,25 @@ export default function WorkflowBuilderPage({
       },
       config: {
         actors: {
-          assignmentType: 'roles',
+          assignmentType: "roles",
           roleIds: [],
           userIds: [],
           dynamicRules: [],
           allowReassignment: true,
         },
         completion: {
-          criteria: 'any',
+          criteria: "any",
           enableTimeout: false,
         },
         conditions: {
-          appliesTo: ['create'],
+          appliesTo: ["create"],
           rules: [],
         },
         notifications: {
           onEntry: { notifyActors: true, notifyRequester: false },
           onCompletion: { notifyRequester: true, notifyNextActors: true },
         },
-        visibility: { type: 'all_participants' },
+        visibility: { type: "all_participants" },
       },
     }
 
@@ -167,17 +172,17 @@ export default function WorkflowBuilderPage({
       <SiteHeader
         title={workflow.name}
         breadcrumbs={[
-          { label: "Apps", href: "/" },
-          { label: app.name, href: `/apps/${appId}` },
+          { label: "S2P Pipeline", href: "/s2p" },
+          { label: stage.name, href: `/s2p/stages/${stageId}` },
         ]}
         actions={
           <div className="flex items-center gap-2">
             <Badge
               variant="secondary"
               className={
-                workflow.status === 'published'
-                  ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 capitalize'
-                  : 'bg-amber-500/10 text-amber-700 dark:text-amber-400 capitalize'
+                workflow.status === "published"
+                  ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 capitalize"
+                  : "bg-amber-500/10 text-amber-700 dark:text-amber-400 capitalize"
               }
             >
               {workflow.status}

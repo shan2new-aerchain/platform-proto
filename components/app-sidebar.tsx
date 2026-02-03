@@ -27,6 +27,7 @@ import {
   MoonIcon,
   ComputerIcon,
   ChevronUp,
+  Flowchart01Icon,
 } from "@hugeicons/core-free-icons"
 import { useAuth } from "@/lib/auth-context"
 import { useTheme } from "@/components/theme-provider"
@@ -50,9 +51,15 @@ const navigation = [
     title: "Main",
     items: [
       {
+        title: "S2P Pipeline",
+        url: "/s2p",
+        icon: Flowchart01Icon,
+      },
+      {
         title: "Apps",
         url: "/",
         icon: DashboardSquare01Icon,
+        exactMatch: true,
       },
       {
         title: "Step Definitions",
@@ -91,9 +98,11 @@ export function AppSidebar() {
                     <SidebarMenuButton
                       asChild
                       isActive={
-                        item.url === "/"
-                          ? pathname === "/"
-                          : pathname.startsWith(item.url)
+                        (item as { exactMatch?: boolean }).exactMatch
+                          ? pathname === item.url
+                          : item.url === "/"
+                            ? pathname === "/"
+                            : pathname.startsWith(item.url)
                       }
                     >
                       <Link href={item.url}>
