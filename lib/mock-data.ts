@@ -896,11 +896,11 @@ export const getActiveCategories = (): AppCategory[] => {
 }
 
 // ============================================
-// S2P Pipeline Data
+// ProcureToPay Pipeline Data
 // ============================================
 
-// S2P Pipeline Stages
-export const s2pPipelineStages: PipelineStage[] = [
+// ProcureToPay Pipeline Stages
+export const procureToPayPipelineStages: PipelineStage[] = [
   {
     id: 'stage-intake',
     appId: 'intake',
@@ -993,8 +993,8 @@ export const s2pPipelineStages: PipelineStage[] = [
   },
 ]
 
-// S2P Pipeline Transitions (linear flow for now)
-export const s2pPipelineTransitions: StageTransition[] = [
+// ProcureToPay Pipeline Transitions (linear flow for now)
+export const procureToPayPipelineTransitions: StageTransition[] = [
   { id: 'tr-start-intake', fromStageId: 'start', toStageId: 'stage-intake' },
   { id: 'tr-intake-req', fromStageId: 'stage-intake', toStageId: 'stage-requisition' },
   { id: 'tr-req-quote', fromStageId: 'stage-requisition', toStageId: 'stage-quote-request' },
@@ -1007,13 +1007,13 @@ export const s2pPipelineTransitions: StageTransition[] = [
   { id: 'tr-pay-end', fromStageId: 'stage-payment', toStageId: 'end' },
 ]
 
-// S2P Pipeline Definition
-export const s2pPipeline: PipelineDefinition = {
-  id: 's2p-pipeline',
-  name: 'Source-to-Pay Pipeline',
+// ProcureToPay Pipeline Definition
+export const procureToPayPipeline: PipelineDefinition = {
+  id: 'procure-to-pay-pipeline',
+  name: 'Procure-to-Pay Pipeline',
   description: 'End-to-end procurement workflow from intake to payment',
-  stages: s2pPipelineStages,
-  transitions: s2pPipelineTransitions,
+  stages: procureToPayPipelineStages,
+  transitions: procureToPayPipelineTransitions,
 }
 
 // ============================================
@@ -1092,7 +1092,7 @@ export const stageWorkflowGraphs: Record<string, StageWorkflowGraph> = {
   'stage-invoice': invoiceStageWorkflowGraph,
 }
 
-// Additional workflows for S2P stages
+// Additional workflows for ProcureToPay stages
 export const intakeApprovalWorkflow: WorkflowDefinition = {
   id: 'intake-approval-wf',
   name: 'Intake Approval Workflow',
@@ -1596,14 +1596,14 @@ export const allWorkflowDefinitions: WorkflowDefinition[] = [
   requisitionCancelWorkflow,
 ]
 
-// Helper functions for S2P Pipeline
+// Helper functions for ProcureToPay Pipeline
 export const getPipelineById = (pipelineId: string): PipelineDefinition | undefined => {
-  if (pipelineId === 's2p-pipeline') return s2pPipeline
+  if (pipelineId === 'procure-to-pay-pipeline') return procureToPayPipeline
   return undefined
 }
 
 export const getStageById = (stageId: string): PipelineStage | undefined => {
-  return s2pPipelineStages.find((stage) => stage.id === stageId)
+  return procureToPayPipelineStages.find((stage) => stage.id === stageId)
 }
 
 export const getStageWorkflowGraph = (stageId: string): StageWorkflowGraph | undefined => {
@@ -1620,5 +1620,5 @@ export const getWorkflowsForStage = (stageId: string): WorkflowDefinition[] => {
 }
 
 export const getEnabledStages = (): PipelineStage[] => {
-  return s2pPipelineStages.filter((stage) => stage.status === 'enabled')
+  return procureToPayPipelineStages.filter((stage) => stage.status === 'enabled')
 }

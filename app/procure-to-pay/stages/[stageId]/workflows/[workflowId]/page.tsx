@@ -30,7 +30,7 @@ import {
 import type { Step, StepType, WorkflowDefinition } from "@/lib/workflow-types"
 import type { StepConfigFocus } from "@/components/workflow/step-config-sheet"
 
-export default function S2PWorkflowBuilderPage({
+export default function ProcureToPayWorkflowBuilderPage({
   params,
 }: {
   params: Promise<{ stageId: string; workflowId: string }>
@@ -172,8 +172,8 @@ export default function S2PWorkflowBuilderPage({
       <SiteHeader
         title={workflow.name}
         breadcrumbs={[
-          { label: "S2P Pipeline", href: "/s2p" },
-          { label: stage.name, href: `/s2p/stages/${stageId}` },
+          { label: "ProcureToPay", href: "/procure-to-pay" },
+          { label: stage.name, href: `/procure-to-pay/stages/${stageId}` },
         ]}
         actions={
           <div className="flex items-center gap-2">

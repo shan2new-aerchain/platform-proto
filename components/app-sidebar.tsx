@@ -51,8 +51,8 @@ const navigation = [
     title: "Main",
     items: [
       {
-        title: "S2P Pipeline",
-        url: "/s2p",
+        title: "ProcureToPay",
+        url: "/procure-to-pay",
         icon: Flowchart01Icon,
       },
       {

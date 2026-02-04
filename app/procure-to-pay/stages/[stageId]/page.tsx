@@ -51,7 +51,7 @@ export default function StagePage({
 
   // Redirect if stage is disabled
   if (stage.status === "disabled") {
-    router.push("/s2p")
+    router.push("/procure-to-pay")
     return null
   }
 
@@ -93,7 +93,7 @@ export default function StagePage({
     : null
 
   const handleWorkflowClick = (workflowId: string) => {
-    router.push(`/s2p/stages/${stageId}/workflows/${workflowId}`)
+    router.push(`/procure-to-pay/stages/${stageId}/workflows/${workflowId}`)
   }
 
   const handleCreateWorkflow = (newWorkflow: {
@@ -177,7 +177,7 @@ export default function StagePage({
     <div className="flex h-screen flex-col">
       <SiteHeader
         title={stage.name}
-        breadcrumbs={[{ label: "S2P Pipeline", href: "/s2p" }]}
+        breadcrumbs={[{ label: "ProcureToPay", href: "/procure-to-pay" }]}
         actions={
           <Button size="sm" className="h-7" onClick={() => setShowAddDialog(true)}>
             <HugeiconsIcon icon={Add01Icon} size={14} />

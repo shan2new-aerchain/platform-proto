@@ -32,7 +32,7 @@ export default function LoginPage() {
     setTimeout(() => {
       const success = login(password)
       if (success) {
-        router.push("/")
+        router.push("/procure-to-pay")
       } else {
         setError("Incorrect password. Please try again.")
         setIsLoading(false)
