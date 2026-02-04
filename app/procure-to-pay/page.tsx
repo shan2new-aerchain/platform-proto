@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/site-header"
 import { PipelineCanvas } from "@/components/pipeline/pipeline-canvas"
 import { procureToPayPipeline } from "@/lib/mock-data"
 
-export default function ProcureToPayPipelinePage() {
+export default function CorePipelinePage() {
   const router = useRouter()
   const [selectedStageId, setSelectedStageId] = useState<string | null>(null)
 

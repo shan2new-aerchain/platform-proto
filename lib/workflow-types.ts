@@ -155,13 +155,13 @@ export interface Role {
 }
 
 // ============================================
-// ProcureToPay Pipeline Types
+// Core Pipeline Types
 // ============================================
 
 // Pipeline Stage status
 export type StageStatus = 'enabled' | 'disabled' | 'coming_soon'
 
-// Pipeline Stage - represents a major stage in the ProcureToPay pipeline
+// Pipeline Stage - represents a major stage in the Core Pipeline
 export interface PipelineStage {
   id: string
   appId: string  // Links to existing App
@@ -180,7 +180,7 @@ export interface StageTransition {
   toStageId: string | 'end'
 }
 
-// Pipeline Definition - the complete ProcureToPay pipeline
+// Pipeline Definition - the complete Core Pipeline
 export interface PipelineDefinition {
   id: string
   name: string

@@ -896,10 +896,10 @@ export const getActiveCategories = (): AppCategory[] => {
 }
 
 // ============================================
-// ProcureToPay Pipeline Data
+// Core Pipeline Data
 // ============================================
 
-// ProcureToPay Pipeline Stages
+// Core Pipeline Stages
 export const procureToPayPipelineStages: PipelineStage[] = [
   {
     id: 'stage-intake',
@@ -993,7 +993,7 @@ export const procureToPayPipelineStages: PipelineStage[] = [
   },
 ]
 
-// ProcureToPay Pipeline Transitions (linear flow for now)
+// Core Pipeline Transitions (linear flow for now)
 export const procureToPayPipelineTransitions: StageTransition[] = [
   { id: 'tr-start-intake', fromStageId: 'start', toStageId: 'stage-intake' },
   { id: 'tr-intake-req', fromStageId: 'stage-intake', toStageId: 'stage-requisition' },
@@ -1007,10 +1007,10 @@ export const procureToPayPipelineTransitions: StageTransition[] = [
   { id: 'tr-pay-end', fromStageId: 'stage-payment', toStageId: 'end' },
 ]
 
-// ProcureToPay Pipeline Definition
+// Core Pipeline Definition
 export const procureToPayPipeline: PipelineDefinition = {
   id: 'procure-to-pay-pipeline',
-  name: 'Procure-to-Pay Pipeline',
+  name: 'Core Pipeline',
   description: 'End-to-end procurement workflow from intake to payment',
   stages: procureToPayPipelineStages,
   transitions: procureToPayPipelineTransitions,
@@ -1092,7 +1092,7 @@ export const stageWorkflowGraphs: Record<string, StageWorkflowGraph> = {
   'stage-invoice': invoiceStageWorkflowGraph,
 }
 
-// Additional workflows for ProcureToPay stages
+// Additional workflows for Core Pipeline stages
 export const intakeApprovalWorkflow: WorkflowDefinition = {
   id: 'intake-approval-wf',
   name: 'Intake Approval Workflow',
@@ -1596,7 +1596,7 @@ export const allWorkflowDefinitions: WorkflowDefinition[] = [
   requisitionCancelWorkflow,
 ]
 
-// Helper functions for ProcureToPay Pipeline
+// Helper functions for Core Pipeline
 export const getPipelineById = (pipelineId: string): PipelineDefinition | undefined => {
   if (pipelineId === 'procure-to-pay-pipeline') return procureToPayPipeline
   return undefined

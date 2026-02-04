@@ -177,7 +177,7 @@ export default function StagePage({
     <div className="flex h-screen flex-col">
       <SiteHeader
         title={stage.name}
-        breadcrumbs={[{ label: "ProcureToPay", href: "/procure-to-pay" }]}
+        breadcrumbs={[{ label: "Core Pipeline", href: "/procure-to-pay" }]}
         actions={
           <Button size="sm" className="h-7" onClick={() => setShowAddDialog(true)}>
             <HugeiconsIcon icon={Add01Icon} size={14} />

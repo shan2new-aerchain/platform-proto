@@ -51,7 +51,7 @@ const navigation = [
     title: "Main",
     items: [
       {
-        title: "ProcureToPay",
+        title: "Core Pipeline",
         url: "/procure-to-pay",
         icon: Flowchart01Icon,
       },

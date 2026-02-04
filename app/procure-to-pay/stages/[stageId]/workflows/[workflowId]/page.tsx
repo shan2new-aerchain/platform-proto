@@ -30,7 +30,7 @@ import {
 import type { Step, StepType, WorkflowDefinition } from "@/lib/workflow-types"
 import type { StepConfigFocus } from "@/components/workflow/step-config-sheet"
 
-export default function ProcureToPayWorkflowBuilderPage({
+export default function CorePipelineWorkflowBuilderPage({
   params,
 }: {
   params: Promise<{ stageId: string; workflowId: string }>
@@ -172,7 +172,7 @@ export default function ProcureToPayWorkflowBuilderPage({
       <SiteHeader
         title={workflow.name}
         breadcrumbs={[
-          { label: "ProcureToPay", href: "/procure-to-pay" },
+          { label: "Core Pipeline", href: "/procure-to-pay" },
           { label: stage.name, href: `/procure-to-pay/stages/${stageId}` },
         ]}
         actions={
